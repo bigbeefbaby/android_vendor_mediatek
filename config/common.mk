@@ -1,5 +1,5 @@
 # Common overlays
-DEVICE_PACKAGE_OVERLAYS += vendor/mediatek/overlay
+#DEVICE_PACKAGE_OVERLAYS += vendor/mediatek/overlay
 
 # Shim libraries
 PRODUCT_PACKAGES += \

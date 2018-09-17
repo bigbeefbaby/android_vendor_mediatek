@@ -1,5 +1,5 @@
 # Common overlays
-DEVICE_PACKAGE_OVERLAYS += vendor/mad/overlay
+DEVICE_PACKAGE_OVERLAYS += vendor/mediatek/overlay
 
 # Shim libraries
 PRODUCT_PACKAGES += \
@@ -15,7 +15,7 @@ PRODUCT_PACKAGES += \
 
 # GPS
 PRODUCT_COPY_FILES += \
-    vendor/mad/prebuilt/etc/agps_profiles_conf2.xml:system/etc/agps_profiles_conf2.xml
+    vendor/mediatek/prebuilt/etc/agps_profiles_conf2.xml:system/etc/agps_profiles_conf2.xml
 
 PRODUCT_PACKAGES += \
     libcurl
@@ -76,12 +76,11 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.build.selinux=0
 
-# madOS Versioning
 ANDROID_VERSION = 7.1.2
 
 # include other configs
-include vendor/mad/config/permissions.mk
-include vendor/mad/config/media.mk
-include vendor/mad/config/wifi.mk
-include vendor/mad/config/telephony.mk
-include vendor/mad/config/google_override.mk
+include vendor/mediatek/config/permissions.mk
+include vendor/mediatek/config/media.mk
+include vendor/mediatek/config/wifi.mk
+include vendor/mediatek/config/telephony.mk
+include vendor/mediatek/config/google_override.mk

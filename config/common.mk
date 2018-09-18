@@ -1,6 +1,3 @@
-# Common overlays
-#DEVICE_PACKAGE_OVERLAYS += vendor/mediatek/overlay
-
 # Shim libraries
 PRODUCT_PACKAGES += \
     libmtkshim_log \
@@ -73,8 +70,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.config.vc_call_vol_steps=14 \
     ro.config.media_vol_steps=30
 
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.build.selinux=0
+BOARD_SEPOLICY_DIRS := \
+  vendor/mediatek/sepolicy
 
 ANDROID_VERSION = 7.1.2
 

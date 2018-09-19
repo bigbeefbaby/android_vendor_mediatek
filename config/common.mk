@@ -70,8 +70,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.config.vc_call_vol_steps=14 \
     ro.config.media_vol_steps=30
 
-BOARD_SEPOLICY_DIRS := \
-  vendor/mediatek/sepolicy
+#BOARD_SEPOLICY_DIRS := \
+#  vendor/mediatek/sepolicy
 
 ANDROID_VERSION = 7.1.2
 

@@ -9,8 +9,6 @@ extern "C" {
         _ZN7android11BufferQueue17createBufferQueueEPNS_2spINS_22IGraphicBufferProducerEEEPNS1_INS_22IGraphicBufferConsumerEEEb(outProducer, outConsumer, false);
     }
 
-    void _ZN7android11IDumpTunnel11asInterfaceERKNS_2spINS_7IBinderEEE(const android::sp<android::IBinder>&) {}
-
 #ifdef __LP64__
     void _ZN7android18BufferItemConsumerC2ERKNS_2spINS_22IGraphicBufferConsumerEEEmib(const android::sp<android::IGraphicBufferConsumer>&, uint64_t, int, bool);
 

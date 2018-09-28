@@ -61,24 +61,16 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     ThemeInterfacer
 
-# Eleven
-PRODUCT_PACKAGES += \
-    Eleven
-
 # Granular Volume Steps
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.config.vc_call_vol_steps=14 \
     ro.config.media_vol_steps=30
 
-#BOARD_SEPOLICY_DIRS := \
-#  vendor/mediatek/sepolicy
-
 ANDROID_VERSION = 7.1.2
 
 # include other configs
 include vendor/mediatek/config/permissions.mk
-include vendor/mediatek/config/symbols.mk
 include vendor/mediatek/config/media.mk
+include vendor/mediatek/config/symbols.mk
 include vendor/mediatek/config/wifi.mk
 include vendor/mediatek/config/telephony.mk
-include vendor/mediatek/config/google_override.mk

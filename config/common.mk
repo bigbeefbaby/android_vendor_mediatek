@@ -72,5 +72,4 @@ ANDROID_VERSION = 7.1.2
 include vendor/mediatek/config/permissions.mk
 include vendor/mediatek/config/media.mk
 include vendor/mediatek/config/symbols.mk
-include vendor/mediatek/config/wifi.mk
 include vendor/mediatek/config/telephony.mk

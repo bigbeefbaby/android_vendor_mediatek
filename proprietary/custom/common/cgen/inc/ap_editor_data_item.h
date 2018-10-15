@@ -44,7 +44,7 @@
 
 // add by chipeng , temporary modify
 //#include "../../custom/oppo/cgen/inc/Custom_NvRam_LID.h"
-#include "Custom_NvRam_LID.h"
+//#include "Custom_NvRam_LID.h"
 
 /***************************************************************************** 
 * Include

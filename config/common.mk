@@ -1,5 +1,5 @@
 # Common overlays
-DEVICE_PACKAGE_OVERLAYS += vendor/mad/overlay
+DEVICE_PACKAGE_OVERLAYS += vendor/mediatek/overlay
 
 # Shim libraries
 PRODUCT_PACKAGES += \
@@ -73,7 +73,7 @@ PRODUCT_PACKAGES += \
     libcurl
 
 PRODUCT_COPY_FILES += \
-    vendor/mad/prebuilt/etc/agps_profiles_conf2.xml:system/etc/agps_profiles_conf2.xml
+    vendor/mediatek/prebuilt/etc/agps_profiles_conf2.xml:system/etc/agps_profiles_conf2.xml
 
 # Jelly
 PRODUCT_PACKAGES += \
@@ -90,14 +90,6 @@ PRODUCT_PACKAGES += \
 # madCamera
 PRODUCT_PACKAGES += \
     madCamera
-
-# madWallpapers
-PRODUCT_PACKAGES += \
-    madWallpapers
-
-# madLauncher
-PRODUCT_PACKAGES += \
-    madLauncher
 
 # Include explicitly to work around Facelock issues
 PRODUCT_PACKAGES += \
@@ -133,7 +125,6 @@ PRODUCT_PACKAGES += \
 # Charger
 PRODUCT_PACKAGES += \
     charger_res_images \
-    mad_charger_res_images
 
 # WallpaperPicker
 PRODUCT_PACKAGES += \
@@ -151,22 +142,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     ThemeInterfacer
 
-# Eleven
-PRODUCT_PACKAGES += \
-    Eleven
-
-# Bootanimation
-ifneq ($(filter 720,$(TARGET_SCREEN_WIDTH)),)
-    PRODUCT_COPY_FILES += \
-        vendor/mad/prebuilt/bootanimation/720p.zip:system/media/bootanimation.zip
-endif
-ifneq ($(filter 1080,$(TARGET_SCREEN_WIDTH)),)
-    PRODUCT_COPY_FILES += \
-        vendor/mad/prebuilt/bootanimation/1080p.zip:system/media/bootanimation.zip
-endif
-
-PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
-
 # WiFi Display
 # this property enables the user to access Google WFD settings.
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -176,32 +151,16 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.build.selinux=1
 
-# madOS Versioning
-ANDROID_VERSION = 8.1.0
-MADOS_VERSION = 2.1.3
+LINEAGE_VERSION := 15.1
 
-ifndef MADOS_BUILD_TYPE
-    MADOS_BUILD_TYPE := OFFICIAL
-endif
-
-MADOS_MOD_VERSION := madOS-$(MADOS_VERSION)-$(shell date -u +%Y%m%d)-$(MADOS_BUILD_TYPE)
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.mados.version=$(MADOS_VERSION) \
-    ro.mados.releasetype=$(MADOS_BUILD_TYPE) \
-    ro.modversion=$(MADOS_MOD_VERSION)
-
-MADOS_DISPLAY_VERSION := madOS-$(MADOS_VERSION)-$(MADOS_BUILD_TYPE)
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.mados.display.version=$(MADOS_DISPLAY_VERSION)
+ANDROID_VERSION := 8.1.0
 
 # include other configs
-include vendor/mad/config/permissions.mk
-include vendor/mad/config/media.mk
-include vendor/mad/config/wifi.mk
-include vendor/mad/config/telephony.mk
-include vendor/mad/config/google_override.mk
+include vendor/mediatek/config/permissions.mk
+include vendor/mediatek/config/media.mk
+include vendor/mediatek/config/wifi.mk
+include vendor/mediatek/config/telephony.mk
+include vendor/mediatek/config/google_override.mk
 
 # DEBUG_BOOT
-include vendor/mad/config/debug_boot.mk
+include vendor/mediatek/config/debug_boot.mk

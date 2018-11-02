@@ -38,7 +38,7 @@
 #define MTK_LOG_ENABLE 1
 #include <sys/types.h>
 #include <string.h>
-#include <linux/fm.h>
+#include <fm.h>
 #include "fmlib_cust.h"
 #include <cutils/properties.h>
 #include <cutils/log.h>

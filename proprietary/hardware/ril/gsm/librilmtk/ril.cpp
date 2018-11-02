@@ -15,11 +15,7 @@
 ** limitations under the License.
 */
 
-#ifdef MTK_RIL_MD1
 #define LOG_TAG "RILC"
-#else
-#define LOG_TAG "RIL2C"
-#endif
 
 #include <hardware_legacy/power.h>
 
@@ -55,11 +51,186 @@
 #include <cutils/properties.h>
 #include <RilSapSocket.h>
 
-#include <rilc.h>
+#include "rilc.h"
+#define RILC_H_INCLUDED 1
+
+#include <cutils/sockets.h>
+#include <cutils/jstring.h>
+#include <cutils/record_stream.h>
+#include <utils/Log.h>
+#include <utils/SystemClock.h>
+#include <pthread.h>
+#include <binder/Parcel.h>
+#include <cutils/jstring.h>
+#include <ril_event.h>
+#include <sys/types.h>
+#include <sys/un.h>
+#include <telephony/mtk_ril.h>
+
+#define RIL_SUPPORT_PROXYS  RIL_SUPPORT_CHANNELS
+
+#define RIL_CMD_PROXY_5     RIL_CMD_4
+#define RIL_CMD_PROXY_1     RIL_CMD_3
+#define RIL_CMD_PROXY_2     RIL_CMD_2
+#define RIL_CMD_PROXY_3     RIL_CMD_1
+#define RIL_CMD_PROXY_4     RIL_URC
+#define RIL_CMD_PROXY_6     RIL_ATCI
+
+#define RIL_PROXY_OFFSET    RIL_CHANNEL_OFFSET
+#define RIL_CMD2_PROXY_5    RIL_CMD2_4
+#define RIL_CMD2_PROXY_1    RIL_CMD2_3
+#define RIL_CMD2_PROXY_2    RIL_CMD2_2
+#define RIL_CMD2_PROXY_3    RIL_CMD2_1
+#define RIL_CMD2_PROXY_4    RIL_URC2
+#define RIL_CMD2_PROXY_6    RIL_ATCI2
+
+#define RIL_PROXY_SET3_OFFSET    RIL_CHANNEL_SET3_OFFSET
+#define RIL_CMD3_PROXY_5    RIL_CMD3_4
+#define RIL_CMD3_PROXY_1    RIL_CMD3_3
+#define RIL_CMD3_PROXY_2    RIL_CMD3_2
+#define RIL_CMD3_PROXY_3    RIL_CMD3_1
+#define RIL_CMD3_PROXY_4    RIL_URC3
+#define RIL_CMD3_PROXY_6    RIL_ATCI3
+
+#define RIL_PROXY_SET4_OFFSET    RIL_CHANNEL_SET4_OFFSET
+#define RIL_CMD4_PROXY_5    RIL_CMD4_4
+#define RIL_CMD4_PROXY_1    RIL_CMD4_3
+#define RIL_CMD4_PROXY_2    RIL_CMD4_2
+#define RIL_CMD4_PROXY_3    RIL_CMD4_1
+#define RIL_CMD4_PROXY_4    RIL_URC4
+#define RIL_CMD4_PROXY_6    RIL_ATCI4
+
+extern "C" const char *proxyIdToString(int id);
+
+namespace android {
+
+extern "C" int getTelephonyMode();
+extern "C" int isDualTalkMode();
+extern "C" int isGeminiMode();
+extern "C" int isSingleMode();
+
+extern "C" int getExternalModemSlot();
+extern "C" int isInternationalRoamingEnabled();
+extern "C" int isEVDODTSupport();
+extern "C" int isImsSupport();
+extern "C" int isEpdgSupport();
+extern "C" int isReqFromMAL();
+extern "C" int getExternalModemSlotTelephonyMode();
+extern "C" int isBootupWith3GCapability();
+extern "C" int getRilProxysNum();
+extern "C" int RIL_get3GSIM();
+extern "C" int getSimCount();
+extern "C" RIL_RadioState
+processRadioState(RIL_RadioState newRadioState, RIL_SOCKET_ID socket_id);
+extern "C" RIL_RadioState callOnStateRequest(RIL_SOCKET_ID rid);
+
+
+/*struct CommandInfo {
+    int requestNumber;
+    void (*dispatchFunction) (Parcel &p, struct RequestInfo *pRI);
+    int(*responseFunction) (Parcel &p, void *response, size_t responselen);
+    RILChannelId proxyId;
+    RILChannelId c2kProxyId; // M: Share ril command between c2k/gsm
+} ;*/
+
+/*typedef struct {
+    int requestNumber;
+    int (*responseFunction) (Parcel &p, void *response, size_t responselen);
+    WakeType wakeType;
+} UnsolResponseInfo;*/
+
+/* add general ril client type*/
+/* Like rilj, a ril client is a socket client to access rild*/
+/*typedef struct {
+    int clientID;
+    const char name[128];
+    RIL_SOCKET_ID simID;
+    int fdCommand;
+    int fdListen;
+    struct ril_event* commands_event;
+    struct ril_event* listen_event;
+    pthread_mutex_t * writeMutex;
+    RecordStream *p_rs;
+}RIL_Client_Type;*/
+
+/*typedef struct RequestInfo {
+    RIL_Client_Type *client; //MUST in the beginning
+    int32_t token;      //this is not RIL_Token
+    CommandInfo *pCI;
+    struct RequestInfo *p_next;
+    char cancelled;
+    char local;         // responses to local commands do not go back to command process
+    RIL_SOCKET_ID socket_id;
+    RILChannelId cid;    // For command dispatch after onRequest()
+} RequestInfo;*/
+
+// External SIM [START]
+/*typedef struct RIL_CLIENT {
+    int client_id;
+    int client_command_fd;
+} RIL_CLIENT;*/
+// External SIM [End]
+
+/*typedef struct UserCallbackInfo {
+    RIL_TimedCallback p_callback;
+    void *userParam;
+    struct ril_event event;
+    struct UserCallbackInfo *p_next;
+    RILChannelId cid;    // For command dispatch after onRequest()
+} UserCallbackInfo;*/
+
+/*typedef struct SocketListenParam {
+    RIL_SOCKET_ID socket_id;
+    int fdListen;
+    int fdCommand;
+    char* processName;
+    struct ril_event* commands_event;
+    struct ril_event* listen_event;
+    void (*processCommandsCallback)(int fd, short flags, void *param);
+    RecordStream *p_rs;
+} SocketListenParam;*/
+
+extern "C" const char * requestToString(int request);
+extern "C" const char * failCauseToString(RIL_Errno);
+extern "C" const char * callStateToString(RIL_CallState);
+extern "C" const char * radioStateToString(RIL_RadioState);
+extern "C" const char * rilSocketIdToString(RIL_SOCKET_ID socket_id);
+
+
+/*typedef struct RequestInfoProxy {
+    struct RequestInfoProxy *p_next;
+    RequestInfo * pRI;
+    UserCallbackInfo *pUCI;
+    Parcel* p;
+} RequestInfoProxy;*/
+
+void triggerEvLoop(void);
+void userTimerCallback (int fd, short flags, void *param);
+
+void enqueueLocalRequestResponse(RequestInfo* pRI, void *buffer, size_t buflen, UserCallbackInfo* pUCI, RIL_SOCKET_ID socket_id);
+void enqueueAtciRequest(RequestInfo* pRI, void *buffer, size_t buflen, UserCallbackInfo* pUCI, int forceSendToUrc);
+void enqueue(RequestInfo* pRI, void *buffer, size_t buflen, UserCallbackInfo* pUCI, RIL_SOCKET_ID socket_id);
+void RIL_startRILProxys(void);
+
+/*typedef struct AtResponseList {
+    int id;
+    char* data;
+    size_t datalen;
+    AtResponseList *pNext;
+} AtResponseList;*/
+
+void cacheUrc(int unsolResponse, const void *data, size_t datalen, RIL_SOCKET_ID id);
+void sendPendedUrcs(RIL_SOCKET_ID socket_id, int fdCommand);
+
+extern "C" CommandInfo s_commands[];
+extern "C" CommandInfo s_mtk_commands[];
+extern "C" CommandInfo s_mtk_local_commands[];
+extern const int s_commands_size;
+extern const int s_mtk_commands_size;
+extern const int s_mtk_local_commands_size;
 
 extern "C" void
 RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responselen);
-namespace android {
 
 
 static RIL_SOCKET_ID s_ril_cntx[] = {
@@ -160,11 +331,7 @@ static RIL_SOCKET_ID s_ril_cntx[] = {
 #endif
 
 extern "C"
-#ifdef MTK_RIL_MD2
 char rild[MAX_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_MD2;
-#else
-char rild[MAX_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL;
-#endif
 /*******************************************************************/
 
 RIL_RadioFunctions s_callbacks = {0, NULL, NULL, NULL, NULL, NULL};
@@ -231,7 +398,7 @@ static struct ril_event s_mal_listen_event;
 static struct ril_event s_mal_command_event;
 static pthread_mutex_t s_mal_writeMutex = PTHREAD_MUTEX_INITIALIZER;
 
-#ifdef MTK_RIL_MD1
+//#ifdef MTK_RIL_MD1
 static RIL_Client_Type s_mal_client = {RIL_CLIENT_ID_MAL,
                             SOCKET_NAME_RIL_MAL,
                             RIL_SOCKET_1,
@@ -240,21 +407,11 @@ static RIL_Client_Type s_mal_client = {RIL_CLIENT_ID_MAL,
                             &s_mal_writeMutex,
                             NULL};
 
-#else
-static RIL_Client_Type s_mal_client = { RIL_CLIENT_ID_MAL,
-                            SOCKET_NAME_RIL_MAL_MD2,
-                            RIL_SOCKET_1,
-                            -1, -1,
-                            &s_mal_listen_event, &s_mal_command_event,
-                            &s_mal_writeMutex,
-                            NULL};
-#endif
 
 static struct ril_event s_mal_at_listen_event;
 static struct ril_event s_mal_at_command_event;
 static pthread_mutex_t s_mal_at_writeMutex = PTHREAD_MUTEX_INITIALIZER;
 
-#ifdef MTK_RIL_MD1
 static RIL_Client_Type s_mal_at_client = { RIL_CLIENT_ID_MAL_AT,
                                  SOCKET_NAME_RIL_MAL_AT,
                                  RIL_SOCKET_1,
@@ -263,16 +420,6 @@ static RIL_Client_Type s_mal_at_client = { RIL_CLIENT_ID_MAL_AT,
                                  &s_mal_at_command_event,
                                  &s_mal_at_writeMutex,
                                  NULL};
-#else
-static RIL_Client_Type s_mal_at_client = { RIL_CLIENT_ID_MAL_AT,
-                                 SOCKET_NAME_RIL_MAL_AT_MD2,
-                                 RIL_SOCKET_1,
-                                 -1, -1,
-                                 &s_mal_at_listen_event,
-                                 &s_mal_at_command_event,
-                                 &s_mal_at_writeMutex,
-                                 NULL};
-#endif
 /* atci start */
 static struct ril_event s_ATCIlisten_event;
 static struct ril_event s_ATCIcommand_event;
@@ -447,13 +594,11 @@ static RIL_RadioState processRadioState(RIL_RadioState newRadioState);
 
 static bool isServiceTypeCfQuery(RIL_SsServiceType serType, RIL_SsRequestType reqType);
 
-#ifdef RIL_SHLIB
 extern "C" void RIL_onUnsolicitedResponseSocket(int unsolResponse, const void *data,
                                 size_t datalen, RIL_SOCKET_ID socket_id);
 
 extern "C" void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
                                 size_t datalen);
-#endif
 
 static int sendResponse(Parcel &p, RIL_SOCKET_ID socket_id);
 
@@ -472,7 +617,6 @@ UnsolResponseInfo s_unsolResponses[] = {
 #include "telephony/ril_unsol_commands.h"
 };
 
-#ifdef MTK_RIL
 CommandInfo s_mtk_commands[] = {
 #include "telephony/mtk_ril_commands.h"
 //{0, NULL, NULL, RIL_SUPPORT_PROXYS}
@@ -501,7 +645,6 @@ const int s_commands_size = (int32_t)NUM_ELEMS(s_commands);
 const int s_mtk_commands_size = (int32_t)NUM_ELEMS(s_mtk_commands);
 
 const int s_mtk_local_commands_size = (int32_t)NUM_ELEMS(s_mtk_local_commands);
-#endif
 
 /* For older RILs that do not support new commands RIL_REQUEST_VOICE_RADIO_TECH and
    RIL_UNSOL_VOICE_RADIO_TECH_CHANGED messages, decode the voice radio tech from
@@ -715,9 +858,7 @@ issueLocalRequest(int request, void *data, int len, RIL_SOCKET_ID socket_id) {
     pRI->local = 1;
     pRI->token = 0xffffffff;        // token is not used in this context
     if (request < 1 || request > (int32_t)NUM_ELEMS(s_commands)) {
-#ifdef MTK_RIL
         if (request >= (RIL_REQUEST_VENDOR_BASE + (int32_t)NUM_ELEMS(s_mtk_commands)))
-#endif /* MTK_RIL */
         {
 
             LOGE("issueLocalRequest: unsupported request code %d", request);
@@ -727,15 +868,11 @@ issueLocalRequest(int request, void *data, int len, RIL_SOCKET_ID socket_id) {
         }
     }
 
-#ifdef MTK_RIL
     if (request < RIL_REQUEST_VENDOR_BASE) {
         pRI->pCI = &(s_commands[request]);
     } else {
         pRI->pCI = &(s_mtk_commands[request - RIL_REQUEST_VENDOR_BASE]);
     }
-#else
-    pRI->pCI = &(s_commands[request]);
-#endif /* MTK_RIL */
     pRI->socket_id = socket_id;
 
     ret = pthread_mutex_lock(pendingRequestsMutexHook);
@@ -776,9 +913,7 @@ void issueLocalRequestForResponse(int request, void *data, int len, RIL_SOCKET_I
     pRI->socket_id = socket_id;
 
     if (request < 1 || request > (int32_t)NUM_ELEMS(s_commands)) {
-#ifdef MTK_RIL
         if (request < RIL_REQUEST_VENDOR_BASE || request >= (RIL_REQUEST_VENDOR_BASE + (int32_t)NUM_ELEMS(s_mtk_commands)))
-#endif /* MTK_RIL */
         {
             if(request < RIL_LOCAL_REQUEST_VENDOR_BASE || request >= (RIL_LOCAL_REQUEST_VENDOR_BASE + (int32_t)NUM_ELEMS(s_mtk_local_commands)))
             {
@@ -790,7 +925,6 @@ void issueLocalRequestForResponse(int request, void *data, int len, RIL_SOCKET_I
         }
     }
 
-#ifdef MTK_RIL
     if (request >= RIL_LOCAL_REQUEST_VENDOR_BASE){
         pRI->pCI = &(s_mtk_local_commands[request - RIL_LOCAL_REQUEST_VENDOR_BASE]);
     }else if(request < RIL_REQUEST_VENDOR_BASE) {
@@ -798,10 +932,6 @@ void issueLocalRequestForResponse(int request, void *data, int len, RIL_SOCKET_I
     } else {
         pRI->pCI = &(s_mtk_commands[request - RIL_REQUEST_VENDOR_BASE]);
     }
-#else
-    pRI->pCI = &(s_commands[request]);
-#endif /* MTK_RIL */
-
 
     pRI->cid = RIL_CMD_PROXY_1;
     if (socket_id == RIL_SOCKET_2){
@@ -823,13 +953,9 @@ void issueLocalRequestForResponse(int request, void *data, int len, RIL_SOCKET_I
 
     LOGD("C[locl]> %s", requestToString(request));
 
-#ifdef MTK_RIL
-    {
+    /*{
         enqueueLocalRequestResponse(pRI, data, len, NULL, socket_id);
-    }
-#else
-    s_callbacks.onRequest(request, data, len, pRI);
-#endif
+    }*/
 }
 
 static int
@@ -860,13 +986,11 @@ processCommandBuffer(void *buffer, size_t buflen, RIL_SOCKET_ID socket_id) {
     }
 
     if (request < 1 || request >= (int32_t)NUM_ELEMS(s_commands)) {
-    #ifdef MTK_RIL
         if (request > (RIL_REQUEST_VENDOR_BASE + (int32_t)NUM_ELEMS(s_mtk_commands)) ||
             (request >= (int32_t)NUM_ELEMS(s_commands) && request < RIL_REQUEST_VENDOR_BASE)) {
             if (request > (RIL_LOCAL_REQUEST_VENDOR_BASE + (int32_t)NUM_ELEMS(s_mtk_local_commands))
                 || (request >= (RIL_REQUEST_VENDOR_BASE + (int32_t)NUM_ELEMS(s_mtk_commands)) &&
                 request < RIL_LOCAL_REQUEST_VENDOR_BASE))
-    #endif /* MTK_RIL */
             {
                 Parcel pErr;
                 RLOGE("unsupported request code %d token %d", request, token);
@@ -878,22 +1002,18 @@ processCommandBuffer(void *buffer, size_t buflen, RIL_SOCKET_ID socket_id) {
                 sendResponse(pErr, socket_id);
                 return 0;
             }
-    #ifdef MTK_RIL
         }
-    #endif
     }
 
 
     pRI = (RequestInfo *)calloc(1, sizeof(RequestInfo));
 
     pRI->token = token;
-#ifdef MTK_RIL
     if (request >= RIL_LOCAL_REQUEST_VENDOR_BASE) {
         pRI->pCI = &(s_mtk_local_commands[request - RIL_LOCAL_REQUEST_VENDOR_BASE]);
     } else if (request >= RIL_REQUEST_VENDOR_BASE) {
         pRI->pCI = &(s_mtk_commands[request - RIL_REQUEST_VENDOR_BASE]);
     } else
-#endif /* MTK_RIL */
     {
         pRI->pCI = &(s_commands[request]);
     }
@@ -911,13 +1031,9 @@ processCommandBuffer(void *buffer, size_t buflen, RIL_SOCKET_ID socket_id) {
 
 /*    sLastDispatchedToken = token; */
 
-#ifdef MTK_RIL
-    {
+    /*{
         enqueue(pRI, buffer, buflen, NULL, socket_id);
-    }
-#else
-    pRI->pCI->dispatchFunction(p, pRI);
-#endif
+    }*/
 
     return 0;
 }
@@ -958,10 +1074,8 @@ processClientCommandBuffer(void *buffer, size_t buflen, RIL_Client_Type *client)
     }
 
     if (request < 1 || request >= (int32_t)NUM_ELEMS(s_commands)) {
-    #ifdef MTK_RIL
         if (request > (RIL_REQUEST_VENDOR_BASE + (int32_t)NUM_ELEMS(s_mtk_commands)) ||
             (request >= (int32_t)NUM_ELEMS(s_commands) && request < RIL_REQUEST_VENDOR_BASE))
-    #endif /* MTK_RIL */
         {
             Parcel pErr;
             RLOGE("unsupported request code %d token %d", request, token);
@@ -977,11 +1091,9 @@ processClientCommandBuffer(void *buffer, size_t buflen, RIL_Client_Type *client)
     pRI = (RequestInfo *)calloc(1, sizeof(RequestInfo));
 
     pRI->token = token;
-#ifdef MTK_RIL
     if (request >= RIL_REQUEST_VENDOR_BASE) {
         pRI->pCI = &(s_mtk_commands[request - RIL_REQUEST_VENDOR_BASE]);
     } else
-#endif /* MTK_RIL */
     {
         pRI->pCI = &(s_commands[request]);
     }
@@ -998,13 +1110,9 @@ processClientCommandBuffer(void *buffer, size_t buflen, RIL_Client_Type *client)
     ret = pthread_mutex_unlock(pendingRequestsMutexHook);
     assert (ret == 0);
 
-#ifdef MTK_RIL
-    {
+    /*{
         enqueue(pRI, buffer, buflen, NULL, socket_id);
-    }
-#else
-    pRI->pCI->dispatchFunction(p, pRI);
-#endif
+    }*/
 
     return 0;
 }
@@ -5023,11 +5131,7 @@ static int responseIratStateChange(Parcel &p, void *response, size_t responselen
     return 0;
 }
 
-#ifdef MTK_RIL
 void triggerEvLoop() {
-#else
-static void triggerEvLoop() {
-#endif
     int ret;
     if (!pthread_equal(pthread_self(), s_tid_dispatch)) {
         /* trigger event loop to wakeup. No reason to do this,
@@ -5697,7 +5801,6 @@ static void onCommandsSocketClosed(RIL_SOCKET_ID socket_id) {
     assert (ret == 0);
 
     ///M: CC075: Hangup all calls to sync with rild in phone process crash case @{
-#if defined(MTK_RIL) && defined(MTK_MD_SHUT_DOWN_NT)
     RequestInfo *pRI;
     int request = RIL_REQUEST_HANGUP_ALL;
 
@@ -5744,7 +5847,6 @@ static void onCommandsSocketClosed(RIL_SOCKET_ID socket_id) {
     //2.Even get radio state (E.g., Both SIM1 and SIM2 with valid sim cards)
     //  but it will send this request to the URC channel instead of CC channel
     //issueLocalRequest(RIL_REQUEST_HANGUP_ALL, NULL, 0, socket_id);
-#endif
     /// @}
 
 
@@ -6010,11 +6112,9 @@ static void listenCallback (int fd, short flags, void *param) {
         rilEventAddWakeup (p_info->commands_event);
 
         onNewCommandConnect(p_info->socket_id);
-    #ifdef MTK_RIL
         pthread_mutex_lock(&s_pendingUrcMutex[p_info->socket_id]);
-        sendPendedUrcs(p_info->socket_id, p_info->fdCommand);
+        //sendPendedUrcs(p_info->socket_id, p_info->fdCommand);
         pthread_mutex_unlock(&s_pendingUrcMutex[p_info->socket_id]);
-    #endif
     } else {
         RLOGI("libril: new connection");
 
@@ -6071,9 +6171,7 @@ static void clientListenCallback (int fd, short flags, void *param) {
     //onNewCommandConnect(p_info->socket_id);
 
     //TODO: send the pending urc?
-#ifdef MTK_RIL
     //sendPendedUrcs(p_info->socket_id, p_info->fdCommand);
-#endif
 }
 static void freeDebugCallbackArgs(int number, char **args) {
     for (int i = 0; i < number; i++) {
@@ -6871,58 +6969,40 @@ error:
 }
 
 
-#ifdef MTK_RIL
 void userTimerCallback (int fd, short flags, void *param) {
-#else
-static void userTimerCallback (int fd, short flags, void *param) {
-#endif
     UserCallbackInfo *p_info;
 
     p_info = (UserCallbackInfo *)param;
 
-#ifdef MTK_RIL
     if (p_info->cid > -1)
     {
-        enqueue(NULL, NULL, 0, p_info, RIL_SOCKET_1);
+        //enqueue(NULL, NULL, 0, p_info, RIL_SOCKET_1);
         return;
     }
     else
     {
         p_info->p_callback(p_info->userParam);
     }
-#else
-    p_info->p_callback(p_info->userParam);
-#endif
 
-#ifdef MTK_RIL
     pthread_mutex_lock(&s_last_wake_mutex);
-#endif
     // FIXME generalize this...there should be a cancel mechanism
     if (s_last_wake_timeout_info != NULL && s_last_wake_timeout_info == p_info) {
-#ifdef MTK_RIL
         RLOGD("s_last_wake_timeout_info: %p reset to NULL", s_last_wake_timeout_info);
-#endif
         s_last_wake_timeout_info = NULL;
 
     }
-#ifdef MTK_RIL
     else
     {
          RLOGD("s_last_wake_timeout_info: %p ", s_last_wake_timeout_info);
     }
     pthread_mutex_unlock(&s_last_wake_mutex);
-#endif
 
-#ifdef MTK_RIL
     if (p_info->cid < 0)
     {
         RLOGD("userTimerCallback free  p_info: %p", p_info);
         RLOGD("userTimerCallback free  p_info->event: %p", &(p_info->event));
         free(p_info);
     }
-#else
-    free(p_info);
-#endif
 
 }
 
@@ -7021,7 +7101,6 @@ static void processAtciCommandsCallback(int fd, short flags, void *param) {
             property_set("persist.service.atci.sim", "3");
         }
 
-    #ifdef MTK_RIL
         if (request < RIL_REQUEST_VENDOR_BASE){
             int channelDisable = 0;
             char channel_disable[PROPERTY_VALUE_MAX] ={0};
@@ -7035,9 +7114,6 @@ static void processAtciCommandsCallback(int fd, short flags, void *param) {
         } else {
             pRI->pCI = &(s_mtk_commands[request - RIL_REQUEST_VENDOR_BASE]);
         }
-    #else
-        pRI->pCI = &(s_commands[request]);
-    #endif /* MTK_RIL */
 
         pRI->cid = RIL_CMD_1;
         pRI->socket_id = RIL_SOCKET_1;
@@ -7095,14 +7171,9 @@ static void processAtciCommandsCallback(int fd, short flags, void *param) {
 
         RLOGD("C[locl]> %s", requestToString(request));
 
-#ifdef MTK_RIL
-        {
+        /*{
             enqueueAtciRequest(pRI, buffer, recvLen, NULL, forceHandle);
-        }
-#else
-        /*    sLastDispatchedToken = token; */
-        pRI->pCI->dispatchFunction(p, pRI);
-#endif
+        }*/
 
     }
 
@@ -7275,9 +7346,7 @@ eventLoop(void *param) {
 
 extern "C" void
 RIL_startEventLoop(void) {
-#ifdef MTK_RIL
-    RIL_startRILProxys();
-#endif /* MTK_RIL */
+    //RIL_startRILProxys();
 
     /* spin up eventLoop thread and wait for it to get started */
     s_started = 0;
@@ -7572,11 +7641,7 @@ RIL_registerSocket (const RIL_RadioFunctionsSocket *callbacks) {
         inst = RIL_getRilSocketName() + strlen(SOCKET_NAME_RIL);
     }
 
-#ifdef MTK_RIL_MD1
     char rildebug[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_DEBUG;
-#else
-    char rildebug[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_DEBUG_MD2;
-#endif
 
     s_fdDebug = android_get_control_socket(rildebug);
     if (s_fdDebug < 0) {
@@ -7597,11 +7662,7 @@ RIL_registerSocket (const RIL_RadioFunctionsSocket *callbacks) {
     rilEventAddWakeup (&s_debug_event);
 #endif
 
-#ifdef MTK_RIL_MD1
     char rildatci[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_ATCI;
-#else
-    char rildatci[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_ATCI_MD2;
-#endif
 
     /* atci start */
     s_fdATCI_listen= android_get_control_socket(rildatci);
@@ -7621,11 +7682,7 @@ RIL_registerSocket (const RIL_RadioFunctionsSocket *callbacks) {
     rilEventAddWakeup (&s_ATCIlisten_event);
     /* atci end */
 
-#ifdef MTK_RIL_MD1
     char rildmbim[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_MBIM;
-#else
-    char rildmbim[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_MBIM_MD2;
-#endif
 
     /* mbim start */
     s_fdMBIM_listen= android_get_control_socket(rildmbim);
@@ -7647,11 +7704,7 @@ RIL_registerSocket (const RIL_RadioFunctionsSocket *callbacks) {
     }
     /* mbim end */
 
-#ifdef MTK_RIL_MD1
     char rildoem[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_OEM;
-#else
-    char rildoem[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_OEM_MD2;
-#endif
 
     /* oem start */
     s_fdOem= android_get_control_socket(rildoem);
@@ -7673,11 +7726,7 @@ RIL_registerSocket (const RIL_RadioFunctionsSocket *callbacks) {
     /* atci end */
 
 // External SIM [Start]
-#ifdef MTK_RIL_MD1
     char rildVsim[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_VSIM;
-#else
-    char rildVsim[MAX_DEBUG_SOCKET_NAME_LENGTH] = SOCKET_NAME_RIL_VSIM_MD2;
-#endif
 // External SIM [End]
 
     // External SIM [START]
@@ -7872,7 +7921,6 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
             goto done;
     }
 
-#ifdef MTK_EAP_SIM_AKA
     /*handle response for local request for response*/
     if(pRI->pCI->requestNumber == RIL_LOCAL_REQUEST_SIM_AUTHENTICATION
         || pRI->pCI->requestNumber == RIL_LOCAL_REQUEST_USIM_AUTHENTICATION){
@@ -7924,7 +7972,6 @@ RIL_onRequestComplete(RIL_Token t, RIL_Errno e, void *response, size_t responsel
             delete(strResult);
         }
     }
-#endif
 
    if(pRI->pCI->requestNumber == RIL_LOCAL_REQUEST_GET_SHARED_KEY
       || pRI->pCI->requestNumber == RIL_LOCAL_REQUEST_UPDATE_SIM_LOCK_SETTINGS
@@ -8254,10 +8301,8 @@ void RIL_onUnsolicitedResponseSocket(int unsolResponse, const void *data,
     bool shouldScheduleTimeout = false;
     RIL_RadioState newState;
     RIL_SOCKET_ID soc_id = socket_id;
-#ifdef MTK_RIL
     int fdCommand = -1;
     WakeType wakeType = WAKE_PARTIAL;
-#endif
     /* Hook for current context */
     /* worldPhoneMutexHook refer to &s_worldPhoneMutex */
     pthread_mutex_t* worldPhoneMutexHook = &s_worldPhoneMutex[soc_id];
@@ -8289,18 +8334,15 @@ void RIL_onUnsolicitedResponseSocket(int unsolResponse, const void *data,
 
     if ((unsolResponseIndex < 0)
         || (unsolResponseIndex >= (int32_t)NUM_ELEMS(s_unsolResponses))) {
-    #ifdef MTK_RIL
         if (unsolResponse > (RIL_UNSOL_VENDOR_BASE + (int32_t)NUM_ELEMS(s_mtk_unsolResponses))
                 && unsolResponse > (RIL_LOCAL_GSM_UNSOL_VENDOR_BASE +
                 (int32_t)NUM_ELEMS(s_mtk_local_urc_commands)))
-    #endif /* MTK_RIL */
         {
             RLOGE("unsupported unsolicited response code %d", unsolResponse);
             return;
         }
     }
 
-#ifdef MTK_RIL
     fdCommand = s_ril_param_socket[soc_id].fdCommand;
 
     if (fdCommand == -1
@@ -8323,7 +8365,7 @@ void RIL_onUnsolicitedResponseSocket(int unsolResponse, const void *data,
                     return;
                 }
                 pthread_mutex_lock(&s_pendingUrcMutex[soc_id]);
-                cacheUrc(unsolResponse, data, datalen , soc_id);
+                //cacheUrc(unsolResponse, data, datalen , soc_id);
                 pthread_mutex_unlock(&s_pendingUrcMutex[soc_id]);
                 return;
             }
@@ -8336,7 +8378,7 @@ void RIL_onUnsolicitedResponseSocket(int unsolResponse, const void *data,
                     return;
                 }
                 pthread_mutex_lock(&s_pendingUrcMutex[soc_id]);
-                cacheUrc(unsolResponse, data, datalen , soc_id);
+                //cacheUrc(unsolResponse, data, datalen , soc_id);
                 pthread_mutex_unlock(&s_pendingUrcMutex[soc_id]);
                 return; //cahche then return
         }
@@ -8349,7 +8391,6 @@ void RIL_onUnsolicitedResponseSocket(int unsolResponse, const void *data,
         return;
     }
     // External SIM [End]
-#endif
 
     //MTK-START [mtk04070][111213][ALPS00093395] ATCI for unsolicited response
     char atci_urc_enable[PROPERTY_VALUE_MAX] = {0};
@@ -8451,7 +8492,6 @@ type=%s, ifname=%s, addresses=%s, dnses=%s, gateways=%s",
    // Grab a wake lock if needed for this reponse,
    // as we exit we'll either release it immediately
    // or set a timer to release it later.
-#ifdef MTK_RIL
     /// M: ril proxy
     if (unsolResponse >= RIL_LOCAL_GSM_UNSOL_VENDOR_BASE) {
         unsolResponseIndex = unsolResponse - RIL_LOCAL_GSM_UNSOL_VENDOR_BASE;
@@ -8463,7 +8503,6 @@ type=%s, ifname=%s, addresses=%s, dnses=%s, gateways=%s",
         wakeType = s_mtk_unsolResponses[unsolResponseIndex].wakeType;
     }
     else
-#endif /* MTK_RIL */
     {
         wakeType = s_unsolResponses[unsolResponseIndex].wakeType;
     }
@@ -8499,7 +8538,6 @@ type=%s, ifname=%s, addresses=%s, dnses=%s, gateways=%s",
     p.writeInt32 (RESPONSE_UNSOLICITED);
     p.writeInt32 (unsolResponse);
 
-#ifdef MTK_RIL
     /// M: ril poxy
     if (unsolResponse >= RIL_LOCAL_GSM_UNSOL_VENDOR_BASE) {
         ret = s_mtk_local_urc_commands[unsolResponseIndex]
@@ -8510,7 +8548,6 @@ type=%s, ifname=%s, addresses=%s, dnses=%s, gateways=%s",
         ret = s_mtk_unsolResponses[unsolResponseIndex]
               .responseFunction(p, const_cast<void*>(data), datalen);
     } else
-#endif /* MTK_RIL */
     {
         ret = s_unsolResponses[unsolResponseIndex]
               .responseFunction(p, const_cast<void*>(data), datalen);
@@ -8628,22 +8665,16 @@ type=%s, ifname=%s, addresses=%s, dnses=%s, gateways=%s",
     // FIXME The java code should handshake here to release wake lock
 
     if (shouldScheduleTimeout) {
-#ifdef MTK_RIL
         pthread_mutex_lock(&s_last_wake_mutex);
-#endif
         // Cancel the previous request
         if (s_last_wake_timeout_info != NULL) {
             s_last_wake_timeout_info->userParam = (void *)1;
-#ifdef MTK_RIL
              RLOGD("s_last_wake_timeout_info: %p, cancel",s_last_wake_timeout_info);
-#endif
         }
         s_last_wake_timeout_info
             = internalRequestTimedCallback(wakeTimeoutCallback, NULL,
                                             &TIMEVAL_WAKE_TIMEOUT);
-#ifdef MTK_RIL
         pthread_mutex_unlock(&s_last_wake_mutex);
-#endif
     }
 
     // Normal exit
@@ -8670,9 +8701,7 @@ internalRequestTimedCallback (RIL_TimedCallback callback, void *param,
 
     p_info->p_callback = callback;
     p_info->userParam = param;
-#ifdef MTK_RIL
     p_info->cid = (RILChannelId)-1;
-#endif
 
     if (relativeTime == NULL) {
         /* treat null parameter as a 0 relative time */
@@ -8715,10 +8744,8 @@ failCauseToString(RIL_Errno e) {
         case RIL_E_SMS_SEND_FAIL_RETRY: return "E_SMS_SEND_FAIL_RETRY";
         case RIL_E_SIM_ABSENT:return "E_SIM_ABSENT";
         case RIL_E_ILLEGAL_SIM_OR_ME:return "E_ILLEGAL_SIM_OR_ME";
-#ifdef FEATURE_MULTIMODE_ANDROID
         case RIL_E_SUBSCRIPTION_NOT_AVAILABLE:return "E_SUBSCRIPTION_NOT_AVAILABLE";
         case RIL_E_MODE_NOT_SUPPORTED:return "E_MODE_NOT_SUPPORTED";
-#endif
         default: return "<unknown error>";
     }
 }

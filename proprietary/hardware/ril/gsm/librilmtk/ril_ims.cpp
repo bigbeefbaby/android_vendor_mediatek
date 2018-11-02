@@ -41,6 +41,7 @@
 #include <binder/Parcel.h>
 #include <pwd.h>
 
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -1260,13 +1261,7 @@ static int processCommandBuffer(void *buffer, size_t buflen, RIL_SOCKET_ID socke
 
 /*    sLastDispatchedToken = token; */
 
-#ifdef MTK_RIL
-    {
-        enqueue(pRI, buffer, buflen, NULL, socket_id);
-    }
-#else
     pRI->pCI->dispatchFunction(p, pRI);
-#endif
 
     return 0;
 }
@@ -1845,7 +1840,7 @@ static void IMS_userTimerCallback (int fd, short flags, void *param) {
 #ifdef MTK_RIL
     if (p_info->cid > -1)
     {
-        enqueue(NULL, NULL, 0, p_info, RIL_SOCKET_1);
+        //enqueue(NULL, NULL, 0, p_info, RIL_SOCKET_1);
         return;
     }
     else

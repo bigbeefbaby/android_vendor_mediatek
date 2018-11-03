@@ -41,6 +41,8 @@ LOCAL_MODULE := m4u_ut
   
 LOCAL_SHARED_LIBRARIES := libcutils liblog libion
 
+LOCAL_CFLAGS := -Wno-reserved-user-defined-literal
+
 LOCAL_C_INCLUDES+= $(MTK_PATH_SOURCE)/hardware/m4u/mt6757
 LOCAL_C_INCLUDES+= $(MTK_PATH_SOURCE)/external
 LOCAL_C_INCLUDES += \

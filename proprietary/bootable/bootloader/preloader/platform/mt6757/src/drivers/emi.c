@@ -48,9 +48,9 @@
 //#define print
 #define dbg_print //print
 
-#define MT8163_BRINGUP_TMP (1)
+#define MT6757_BRINGUP_TMP (1)
 
-#if MT8163_BRINGUP_TMP
+#if MT6757_BRINGUP_TMP
 #define GATING_CLOCK_CONTROL_DVT  //for DVT test
 //#define TEST_ASYMMETRY_MODE
 #endif
@@ -577,7 +577,7 @@ static void init_lpddr2(EMI_SETTINGS *emi_setting)
 #endif
 #endif
 
-	// For MT8163 LPDDR2
+	// For MT6757 LPDDR2
 	*((V_UINT32P)(DRAMC0_BASE + 0x00f0)) = 0xC0000000;	// Edward: [31]DQ4BMUX=1 in SBS. [30]S2=1, Edward : 100b for LPDDR2/3, 110b for DDR3x16x2
 	*((V_UINT32P)(DDRPHY_BASE + 0x00f0)) = 0xC0000000;
 
@@ -604,7 +604,7 @@ static void init_lpddr2(EMI_SETTINGS *emi_setting)
 	*((V_UINT32P)(DRAMC0_BASE + 0x0168)) = 0x00000080;
 	*((V_UINT32P)(DDRPHY_BASE + 0x0168)) = 0x00000080;
 
-	//For MT8163 LPDDR2
+	//For MT6757 LPDDR2
 	*((V_UINT32P)(DRAMC0_BASE + 0x00d8)) = 0x00700900;
 	*((V_UINT32P)(DDRPHY_BASE + 0x00d8)) = 0x00700900;
 
@@ -630,7 +630,7 @@ static void init_lpddr2(EMI_SETTINGS *emi_setting)
 
 	//*((V_UINT32P)(DRAMC0_BASE + 0x0158)) = 0xf0f0f0f0;  // Edward: 4 bit swap enable 0xf0f0f0f0. disable 0xff00ff00.
 	//*((V_UINT32P)(DDRPHY_BASE + 0x0158)) = 0xf0f0f0f0;
-	//For MT8163 LPDDR2
+	//For MT6757 LPDDR2
 	*((V_UINT32P)(DRAMC0_BASE + 0x0230)) = 0xf00f0ff0;
 	*((V_UINT32P)(DDRPHY_BASE + 0x0230)) = 0xf00f0ff0;
 
@@ -1015,7 +1015,7 @@ static void init_lpddr3(EMI_SETTINGS *emi_setting)
 	*((V_UINT32P)(DRAMC0_BASE + 0x0048)) = 0x0001110d;
 	*((V_UINT32P)(DDRPHY_BASE + 0x0048)) = 0x0001110d;
 
-    // Todo: For MT8163 LPDDR3 POP
+    // Todo: For MT6757 LPDDR3 POP
     if((emi_setting->LPDDR3_MODE_REG_5 & 0xFFF00000) == 0x17800000)
 	{
 		*((V_UINT32P)(DRAMC0_BASE + 0x00d8)) = 0x40500900;
@@ -1061,7 +1061,7 @@ static void init_lpddr3(EMI_SETTINGS *emi_setting)
 
 	//*((V_UINT32P)(DRAMC0_BASE + 0x00f0)) = 0x00000000; // Edward: DQ4BMUX=1 for SBS. [30]S2=1, Edward : 100b for LPDDR2/3, 110b for DDR3x16x2
 	//*((V_UINT32P)(DDRPHY_BASE + 0x00f0)) = 0x00000000;
-    // Todo: For MT8163 LPDDR3 DSC
+    // Todo: For MT6757 LPDDR3 DSC
 	if((emi_setting->LPDDR3_MODE_REG_5 & 0xFFF00000) == 0x17800000)
 	{
 		*((V_UINT32P)(DRAMC0_BASE + 0x00f0)) = 0x40000000;
@@ -1094,7 +1094,7 @@ static void init_lpddr3(EMI_SETTINGS *emi_setting)
 	*((V_UINT32P)(DRAMC0_BASE + 0x0168)) = 0x00000080;
 	*((V_UINT32P)(DDRPHY_BASE + 0x0168)) = 0x00000080;
 
-    // Todo: For MT8163 LPDDR3 POP
+    // Todo: For MT6757 LPDDR3 POP
 	if((emi_setting->LPDDR3_MODE_REG_5 & 0xFFF00000) == 0x17800000)
 	{
 		*((V_UINT32P)(DRAMC0_BASE + 0x00d8)) = 0x40700900;
@@ -1150,7 +1150,7 @@ static void init_lpddr3(EMI_SETTINGS *emi_setting)
 	*((V_UINT32P)(DRAMC0_BASE + 0x01e8)) = emi_setting->DRAMC_ACTIM1_VAL;	 //LPDDR3EN set to 1
 	*((V_UINT32P)(DDRPHY_BASE + 0x01e8)) = emi_setting->DRAMC_ACTIM1_VAL;	 //LPDDR3EN set to 1
 
-    // Todo: Current for MT8163 LPDDR3 POP
+    // Todo: Current for MT6757 LPDDR3 POP
 	if((emi_setting->LPDDR3_MODE_REG_5 & 0xFFF00000) == 0x17800000)
 	{
 		*((V_UINT32P)(DRAMC0_BASE + 0x0230)) = 0xffff0000;
@@ -1621,7 +1621,7 @@ static void init_ddr3(EMI_SETTINGS *emi_setting)
 	}
     #endif
 
-    // Todo: For MT8163 PCDDR3
+    // Todo: For MT6757 PCDDR3
     if(emi_setting->PCDDR3_MODE_REG5 & (0x1<<30))
     {//DDR3 8bit x4
 	    *(volatile unsigned int *)(DRAMC0_BASE + 0x00F0) = 0xC0000000;
@@ -1707,7 +1707,7 @@ static void init_ddr3(EMI_SETTINGS *emi_setting)
 		*(volatile unsigned int *)(DDRPHY_BASE + 0x00D8) = 0x00300900;
 	}
     #endif
-    // Todo: For MT8163 PCDDR3
+    // Todo: For MT6757 PCDDR3
     *(volatile unsigned int *)(DRAMC0_BASE + 0x00D8) = 0x80300900;
     *(volatile unsigned int *)(DDRPHY_BASE + 0x00D8) = 0x80300900;
 
@@ -1743,7 +1743,7 @@ static void init_ddr3(EMI_SETTINGS *emi_setting)
         *(volatile unsigned int *)(DDRPHY_BASE + 0x0230) = 0xffff0000;
     }
     #endif
-    // Todo: For MT8163 PCDDR3
+    // Todo: For MT6757 PCDDR3
     if(emi_setting->PCDDR3_MODE_REG5 & (0x1<<30))
     {//DDR3 8bit x4
         *(volatile unsigned int *)(DRAMC0_BASE + 0x0230) = 0xf00f0ff0;
@@ -1861,7 +1861,7 @@ static void init_ddr3(EMI_SETTINGS *emi_setting)
     }
     else
     {
-        //dual rank mode, MT8163 2GB setting
+        //dual rank mode, MT6757 2GB setting
         *((volatile unsigned int *)(DRAMC0_BASE + 0x0110)) = 0x0b051211;
         *((volatile unsigned int *)(DDRPHY_BASE + 0x0110)) = 0x0b051211;
     }
@@ -1994,7 +1994,7 @@ static void init_ddr3(EMI_SETTINGS *emi_setting)
     *((volatile unsigned int *)(DRAMC0_BASE + 0x00E4)) = 0x000007a3;  //CKEBYCTL
     *((volatile unsigned int *)(DDRPHY_BASE + 0x00E4)) = 0x000007a3;
 
-    if(emi_setting->PCDDR3_MODE_REG5 & (0x1<<28)) // MT8163 DDR3 2GB
+    if(emi_setting->PCDDR3_MODE_REG5 & (0x1<<28)) // MT6757 DDR3 2GB
     {//DDR3 8bit x4
         *((volatile unsigned int *)(DRAMC0_BASE + 0x01ec)) = 0x00000001;  // Edward : Add this to enable dual scheduler according to Cl and SY.
         *((volatile unsigned int *)(DDRPHY_BASE + 0x01ec)) = 0x00000001;
@@ -2210,7 +2210,7 @@ static int emmc_nand_id_len=16;
 static int fw_id_len;
 static int mt_get_mdl_number (void)
 {
-#if MT8163_BRINGUP_TMP //For bringup temorarily
+#if MT6757_BRINGUP_TMP //For bringup temorarily
     return 0;
 #else
     static int found = 0;
@@ -3167,7 +3167,7 @@ void mt_set_emi (void)
            	*((volatile unsigned int *)(DRAMC0_BASE + 0x00B8)) = 0xFF00CC00; /* [15:8] DQ0~15 driving */
            	*((volatile unsigned int *)(DDRPHY_BASE + 0x00B8)) = 0xFF00CC00;
 	   }
-	   #else // MT8163 2GB setting, disable driving.
+	   #else // MT6757 2GB setting, disable driving.
 	   {
            	//*((volatile unsigned int *)(DRAMC0_BASE + 0x00B4)) = 0xFF00CC00; /* [15:8] DQ16~31 driving */
            	//*((volatile unsigned int *)(DDRPHY_BASE + 0x00B4)) = 0xFF00CC00;

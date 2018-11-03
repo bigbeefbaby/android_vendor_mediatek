@@ -2617,7 +2617,7 @@ void mt_pll_init(void)
     int ret = 0;
     unsigned int temp;
 
-    //MT8163 workaround
+    //MT6757 workaround
     #define NFI_1X_INFRA_SEL 0x10001098
     temp = DRV_Reg32(NFI_1X_INFRA_SEL);
     temp &= (0x1 << 10);

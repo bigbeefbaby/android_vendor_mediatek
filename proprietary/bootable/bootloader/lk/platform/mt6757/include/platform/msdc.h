@@ -835,7 +835,7 @@
 
 
 /*
-  *  This definition is used for MT8163_GPIO_RegMap.doc by fengguo.gao 
+  *  This definition is used for MT6757_GPIO_RegMap.doc by fengguo.gao 
   *  Zhanyong.Wang
   *  2014/11/28
   */
@@ -1517,7 +1517,7 @@ typedef enum __MSDC_PIN_STATE {
 }MSDC_PIN_STATE;
 
 /*
-  *  this definition is used for MT8163_GPIO_RegMap.doc by Sander.Lin 
+  *  this definition is used for MT6757_GPIO_RegMap.doc by Sander.Lin 
   *  Zhanyong.Wang
   *  2014/12/14
   */

@@ -548,14 +548,14 @@ int target_fdt_model(void *fdt)
 	const struct fdt_property *prop;
 	char *prop_name = "model";
 	const char *mali_model_name[] = {
-		"MT8163",
-		"MT8163",
-		"MT8163",
+		"MT6757",
+		"MT6757",
+		"MT6757",
 	};
 	const char *sph_model_name[] = {
-		"MT8163S",
-		"MT8163S",
-		"MT8163S",
+		"MT6757S",
+		"MT6757S",
+		"MT6757S",
 	};
 
 	if (code > code_max)

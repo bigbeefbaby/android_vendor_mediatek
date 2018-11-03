@@ -21,6 +21,8 @@ SECRO_CONFIG := vendor/mediatek/proprietary/custom/common/secro/SECRO_GMP.ini
 else
 SECRO_CONFIG := vendor/mediatek/proprietary/custom/common/secro/SECRO_DEFAULT_LOCK_CFG.ini
 endif
+MTK_PROJECT := "mt6757"
+MTK_PATH_CUSTOM := "vendor/mediatek/proprietary/custom"
 
 secroimage: 
 	@perl $(SECRO_POST_SCRIPT) $(SECRO_CONFIG) $(MTK_PROJECT) $(MTK_PATH_CUSTOM) $(MTK_SEC_SECRO_AC_SUPPORT) $(INSTALLED_SECROIMAGE_TARGET) $(SECRO_TYPE) $(MTK_TARGET_PROJECT) $(OUT_DIR) $(HOST_OS)

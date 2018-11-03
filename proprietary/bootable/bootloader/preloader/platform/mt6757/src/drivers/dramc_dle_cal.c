@@ -161,7 +161,7 @@ void dle_factor_handler(char **factor_value, char mode) {
     curr_val = atoi(*factor_value);
     //dbg_print("dle_factor_handler, curr_val:0x%x\n", curr_val);
 
-    #if 1 //MT8163
+    #if 1 //MT6757
     DRAMC_WRITE_REG((DRAMC_READ_REG(DRAMC_DATLATCTL) & 0xFFE0E0FF)
 		| ((curr_val & 0x1F) << 16)
 		| (((curr_val & 0x1F) - 0x4) << 8),	//Notice: Need ensure curr_val( from dle_tbl) >= 4 !!!		

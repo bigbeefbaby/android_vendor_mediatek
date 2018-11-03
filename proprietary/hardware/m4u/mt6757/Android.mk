@@ -35,7 +35,7 @@
 
 
 
-ifeq ($(MTK_PLATFORM),$(filter $(MTK_PLATFORM),MT8163))
+ifeq ($(MTK_PLATFORM),$(filter $(MTK_PLATFORM),MT6757))
 
 LOCAL_PATH:= $(call my-dir)
 

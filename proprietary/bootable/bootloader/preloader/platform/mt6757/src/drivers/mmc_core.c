@@ -3531,10 +3531,10 @@ u32 mmc_is_exist(u32 id)
 #define EFUSE_M_HW2_RES0                0x000061C0
 #define EFUSE_EMMC_MSDC3_DIS            (1ul <<  7)
 #define EFUSE_EMMC_MSDC0_DIS            (1ul <<  6)
-#define MT8163_IO_READ32(addr, index)   (*(volatile unsigned int*)((addr) + (index)))
+#define MT6757_IO_READ32(addr, index)   (*(volatile unsigned int*)((addr) + (index)))
 
-#define EFUSE_EMMC_MSDC3_IsDisabled()   (!!(MT8163_IO_READ32(EFUSE_BASE,EFUSE_M_HW2_RES0) & EFUSE_EMMC_MSDC3_DIS))
-#define EFUSE_EMMC_MSDC0_IsDisabled()   (!!(MT8163_IO_READ32(EFUSE_BASE,EFUSE_M_HW2_RES0) & EFUSE_EMMC_MSDC0_DIS))
+#define EFUSE_EMMC_MSDC3_IsDisabled()   (!!(MT6757_IO_READ32(EFUSE_BASE,EFUSE_M_HW2_RES0) & EFUSE_EMMC_MSDC3_DIS))
+#define EFUSE_EMMC_MSDC0_IsDisabled()   (!!(MT6757_IO_READ32(EFUSE_BASE,EFUSE_M_HW2_RES0) & EFUSE_EMMC_MSDC0_DIS))
 #endif
 u32 mmc_whoami(void)
 {

@@ -33,8 +33,8 @@
  * applicable license agreements with MediaTek Inc.
  */
 
-#ifndef MT8163_H
-#define MT8163_H
+#ifndef MT6757_H
+#define MT6757_H
 
 /*=======================================================================*/
 /* Constant Definitions                                                  */
@@ -50,7 +50,7 @@
 /*=======================================================================*/
 /* FIXME, these registers are defined for mt6589, not sure the corresponding register in mt6582*/
 #define TOPCKGEN_BASE       (IO_PHYS + 0x0000)
-#define CONFIG_BASE         (IO_PHYS + 0x1000)		/* FIXME do not list in MT8163 memory map*/
+#define CONFIG_BASE         (IO_PHYS + 0x1000)		/* FIXME do not list in MT6757 memory map*/
 #define INFRACFG_AO_BASE    (IO_PHYS + 0x1000)
 #define IOCFG_L_BASE        (IO_PHYS + 0x2000)
 #define IOCFG_B_BASE        (IO_PHYS + 0x2400)
@@ -68,11 +68,11 @@
 #define DDRPHY_BASE         (IO_PHYS + 0xF000)
 #define KPD_BASE            (IO_PHYS + 0x00010000)
 
-//#define DEM_BASE            (IO_PHYS + 0x0011A000)  /* FIXME do not list in MT8163 memory map*/
+//#define DEM_BASE            (IO_PHYS + 0x0011A000)  /* FIXME do not list in MT6757 memory map*/
 
 #define MCUSYS_CFGREG_BASE  (IO_PHYS + 0x00200000)
-#define CA7MCUCFG_BASE      (IO_PHYS + 0x00200100)	/* FIXME do not list in MT8163 memory map*/
-#define CA15L_CONFIG_BASE   (IO_PHYS + 0x00200200)	/* FIXME do not list in MT8163 memory map*/
+#define CA7MCUCFG_BASE      (IO_PHYS + 0x00200100)	/* FIXME do not list in MT6757 memory map*/
+#define CA15L_CONFIG_BASE   (IO_PHYS + 0x00200200)	/* FIXME do not list in MT6757 memory map*/
 #define SRAMROM_BASE        (IO_PHYS + 0x00202000)
 #define EMI_BASE            (IO_PHYS + 0x00203000)
 #define DRAMC_NAO_BASE      (IO_PHYS + 0x0020E000)
@@ -94,8 +94,8 @@
 #define SPI_BASE            (IO_PHYS + 0x0100A000)  
 #define NFI_BASE            (IO_PHYS + 0x0100D000)
 #define NFIECC_BASE         (IO_PHYS + 0x0100E000)
-//#define I2C3_BASE           (IO_PHYS + 0x01010000)	/* FIXME do not list in MT8163 memory map*/
-//#define I2C4_BASE           (IO_PHYS + 0x01011000)	/* FIXME do not list in MT8163 memory map*/
+//#define I2C3_BASE           (IO_PHYS + 0x01010000)	/* FIXME do not list in MT6757 memory map*/
+//#define I2C4_BASE           (IO_PHYS + 0x01011000)	/* FIXME do not list in MT6757 memory map*/
 #define USBSIF_BASE         (IO_PHYS + 0x01210000)  
 #define MSDC0_BASE          (IO_PHYS + 0x01230000)
 #define MSDC1_BASE          (IO_PHYS + 0x01240000)
@@ -103,8 +103,8 @@
 #define MSDC3_BASE          (IO_PHYS + 0x01260000)
 //#define U3D_BASE			(IO_PHYS + 0x01270000)
 #define USB_BASE			(IO_PHYS + 0x01200000)
-//#define USB_SIF_BASE		(IO_PHYS + 0x01280000)		/* FIXME do not list in MT8163 memory map*/
-//#define USB_SIF2_BASE		(IO_PHYS + 0x01290000)		/* FIXME do not list in MT8163 memory map*/
+//#define USB_SIF_BASE		(IO_PHYS + 0x01280000)		/* FIXME do not list in MT6757 memory map*/
+//#define USB_SIF2_BASE		(IO_PHYS + 0x01290000)		/* FIXME do not list in MT6757 memory map*/
 
 
 /*=======================================================================*/
@@ -126,9 +126,9 @@
 #define SSUSB_USB3_SYS_CSR_BASE			(U3D_BASE + 0x2400)
 #define SSUSB_USB2_CSR_BASE				(U3D_BASE + 0x3400)
 
-#define SSUSB_SIFSLV_IPPC_BASE				(USB_SIF_BASE + 0x700)	/* FIXME do not list in MT8163 memory map*/
-#define SSUSB_SIFSLV_U2PHY_COM_BASE			(USB_SIF_BASE + 0x800)	/* FIXME do not list in MT8163 memory map*/
-#define SSUSB_SIFSLV_U2PHY_COM_SIV_B_BASE	(USB_SIF2_BASE + 0x800)	/* FIXME do not list in MT8163 memory map*/
+#define SSUSB_SIFSLV_IPPC_BASE				(USB_SIF_BASE + 0x700)	/* FIXME do not list in MT6757 memory map*/
+#define SSUSB_SIFSLV_U2PHY_COM_BASE			(USB_SIF_BASE + 0x800)	/* FIXME do not list in MT6757 memory map*/
+#define SSUSB_SIFSLV_U2PHY_COM_SIV_B_BASE	(USB_SIF2_BASE + 0x800)	/* FIXME do not list in MT6757 memory map*/
 
 
 /*=======================================================================*/

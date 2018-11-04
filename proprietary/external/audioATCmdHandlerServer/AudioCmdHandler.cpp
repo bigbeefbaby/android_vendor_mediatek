@@ -836,7 +836,7 @@ ACHStatus AudioCmdHandler::DLCustSPHMagiParamToNV(void *pParam)
 		 pSPHMagiPara = NULL;
 		 return ACHFailed;
 	 }
-	 memcpy((void *)pSPHMagiPara, pParam + sizeof(int), sizeof(AUDIO_CUSTOM_MAGI_CONFERENCE_STRUCT));
+	 memcpy((void *)pSPHMagiPara, sizeof(int), sizeof(AUDIO_CUSTOM_MAGI_CONFERENCE_STRUCT));
 
     for (int i = 0; i < 32 ;  i++)
     {
@@ -887,7 +887,7 @@ ACHStatus AudioCmdHandler::ULCustSPHMagiParamFromNV(void *pParam, int *len)
     }
 
 	dataLen = sizeof(AUDIO_CUSTOM_MAGI_CONFERENCE_STRUCT);
-	memcpy(pParam + sizeof(int), (void *)pSPHMagiPara, dataLen);
+	memcpy( sizeof(int), (void *)pSPHMagiPara, dataLen);
 	
 
     ALOGD("ULCustSPHMagiParamFromNV the data sent to PC is %d", dataLen);
@@ -938,7 +938,7 @@ ACHStatus AudioCmdHandler::DLCustSPHHACParamToNV(void *pParam)
 		 pSPHHACPara = NULL;
 		 return ACHFailed;
 	 }
-	 memcpy((void *)pSPHHACPara, pParam + sizeof(int), sizeof(AUDIO_CUSTOM_HAC_PARAM_STRUCT));
+	 memcpy((void *)pSPHHACPara,  sizeof(int), sizeof(AUDIO_CUSTOM_HAC_PARAM_STRUCT));
 
 
     for (int i = 0; i < 32; i++)
@@ -999,7 +999,7 @@ ACHStatus AudioCmdHandler::ULCustSPHHACParamFromNV(void *pParam, int *len)
 
 
 	dataLen = sizeof(AUDIO_CUSTOM_HAC_PARAM_STRUCT);
-	memcpy(pParam + sizeof(int), (void *)pSPHHACPara, dataLen);
+	memcpy( sizeof(int), (void *)pSPHHACPara, dataLen);
 	
 
     ALOGD("ULCustSPHHACParamFromNV the data sent to PC is %d", dataLen);
@@ -1050,7 +1050,7 @@ ACHStatus AudioCmdHandler::DLCustSPHLPBKParamToNV(void *pParam)
 		 pSPHLPBKPara = NULL;
 		 return ACHFailed;
 	 }
-	 memcpy((void *)pSPHLPBKPara, pParam + sizeof(int), sizeof(AUDIO_CUSTOM_SPEECH_LPBK_PARAM_STRUCT));
+	 memcpy((void *)pSPHLPBKPara,  sizeof(int), sizeof(AUDIO_CUSTOM_SPEECH_LPBK_PARAM_STRUCT));
 
 
     for (int i = 0; i < 48; i++)
@@ -1102,7 +1102,7 @@ ACHStatus AudioCmdHandler::ULCustSPHLPBKParamFromNV(void *pParam, int *len)
     }
 
 	dataLen = sizeof(AUDIO_CUSTOM_SPEECH_LPBK_PARAM_STRUCT);
-	memcpy(pParam + sizeof(int), (void *)pSPHLPBKPara, dataLen);
+	memcpy(sizeof(int), (void *)pSPHLPBKPara, dataLen);
 	
 
     ALOGD("ULCustSPHLPBKParamFromNV the data sent to PC is %d", dataLen);
@@ -1150,7 +1150,7 @@ ACHStatus AudioCmdHandler::DLCustSPHParamToNV(void *pParam, int block)
 
     if (block == 0)
     {
-        pCustomPara = (AUD_SPH_PARAM_STRUCT *)(pParam + sizeof(int));
+        pCustomPara = (AUD_SPH_PARAM_STRUCT *)(sizeof(int));
         AUDIO_CUSTOM_PARAM_STRUCT *pSPHPara = (AUDIO_CUSTOM_PARAM_STRUCT *)malloc(sizeof(AUDIO_CUSTOM_PARAM_STRUCT));
         if (pSPHPara == NULL)
         {
@@ -1271,7 +1271,7 @@ ACHStatus AudioCmdHandler::DLCustSPHParamToNV(void *pParam, int block)
             }
         }
 
-        memcpy((void *)pSPHMedPara->speech_output_FIR_coeffs, pParam + sizeof(int), size);
+        memcpy((void *)pSPHMedPara->speech_output_FIR_coeffs, sizeof(int), size);
     }
     else if(block == 2)
     {
@@ -1286,9 +1286,9 @@ ACHStatus AudioCmdHandler::DLCustSPHParamToNV(void *pParam, int block)
             return ACHFailed;
         }
 
-        memcpy((void *)pSPHMedPara->speech_output_FIR_coeffs[2], pParam + sizeof(int), 2 * sizeof(pCustomPara->sph_output_FIR_coeffs[0]));
+        memcpy((void *)pSPHMedPara->speech_output_FIR_coeffs[2], sizeof(int), 2 * sizeof(pCustomPara->sph_output_FIR_coeffs[0]));
         size = 2 * sizeof(pCustomPara->sph_output_FIR_coeffs[0]) + sizeof(int);
-        memcpy((void *)pSPHMedPara->select_FIR_output_index, pParam + size, sizeof(pCustomPara->selected_FIR_output_index));
+        memcpy((void *)pSPHMedPara->select_FIR_output_index, size, sizeof(pCustomPara->selected_FIR_output_index));
 
         for (int i = 0; i < SPH_MODE_NUM ;  i++)
         {
@@ -1309,7 +1309,7 @@ ACHStatus AudioCmdHandler::DLCustSPHParamToNV(void *pParam, int block)
     }
 	else if(block == 3) 
 	{
-		 pFourModeCustomPara = (AUD_SPH_AFTER_FOUR_MODE_PARAM_STRUCT *)(pParam + sizeof(int));
+		 pFourModeCustomPara = (AUD_SPH_AFTER_FOUR_MODE_PARAM_STRUCT *)(sizeof(int));
 		 AUDIO_CUSTOM_PARAM_STRUCT *pSPHPara = (AUDIO_CUSTOM_PARAM_STRUCT *)malloc(sizeof(AUDIO_CUSTOM_PARAM_STRUCT));
 		 if (pSPHPara == NULL)
 		 {
@@ -1449,23 +1449,23 @@ ACHStatus AudioCmdHandler::ULCustSPHParamFromNV(void *pParam, int *len, int bloc
     if (block == 0)
     {
         dataLen = sizeof(AUDIO_CUSTOM_PARAM_STRUCT);
-        memcpy(pParam + sizeof(int), (void *)pSPHPara, dataLen);
+        memcpy( sizeof(int), (void *)pSPHPara, dataLen);
     }
     else if (block == 1)
     {
         dataLen = sizeof(pSPHMedPara->speech_input_FIR_coeffs);
-        memcpy(pParam + sizeof(int), (void *)pSPHMedPara->speech_input_FIR_coeffs, dataLen);
+        memcpy( sizeof(int), (void *)pSPHMedPara->speech_input_FIR_coeffs, dataLen);
     }
     else if (block == 2 || block == 3)
     {
         dataLen = 3 * sizeof(pSPHMedPara->speech_output_FIR_coeffs[0]);
-        memcpy(pParam + sizeof(int), (void *)pSPHMedPara->speech_output_FIR_coeffs[3 * block - 6], dataLen);
+        memcpy( sizeof(int), (void *)pSPHMedPara->speech_output_FIR_coeffs[3 * block - 6], dataLen);
     }
     else
     {
         dataLen = 2 * sizeof(pSPHMedPara->speech_output_FIR_coeffs[0]) + sizeof(pSPHMedPara->speech_mode_para);
         dataLen += sizeof(pSPHMedPara->select_FIR_intput_index) + sizeof(pSPHMedPara->select_FIR_output_index);
-        memcpy(pParam + sizeof(int), (void *)pSPHMedPara->speech_output_FIR_coeffs[6], dataLen);
+        memcpy( sizeof(int), (void *)pSPHMedPara->speech_output_FIR_coeffs[6], dataLen);
     }
 
     ALOGD("ULCustSPHParamFromNV the data sent to PC is %d", dataLen);
@@ -1506,7 +1506,7 @@ ACHStatus AudioCmdHandler::DLCustSPHVolumeParamToNV(void *pParam)
         return ACHFailed;
     }
 
-    AUD_VOL_CUSTOM_STRUCT *pCustomPara = (AUD_VOL_CUSTOM_STRUCT *)(pParam + sizeof(int));
+    AUD_VOL_CUSTOM_STRUCT *pCustomPara = (AUD_VOL_CUSTOM_STRUCT *)( sizeof(int));
 
 #if 0
     size = GetAudioCustomParamFromNV(pSPHVolPara);
@@ -1745,7 +1745,7 @@ ACHStatus AudioCmdHandler::ULCustSPHVolumeParamFromNV(void *pParam, int *len)
 #endif
 
     *((int *)pParam) = sizeof(AUD_VOL_CUSTOM_STRUCT);
-    AUD_VOL_CUSTOM_STRUCT *pCustomPara = (AUD_VOL_CUSTOM_STRUCT *)(pParam + sizeof(int));
+    AUD_VOL_CUSTOM_STRUCT *pCustomPara = (AUD_VOL_CUSTOM_STRUCT *)( sizeof(int));
 
     memcpy((void *)pCustomPara, (void *)pSPHVolPara, sizeof(AUD_VOL_CUSTOM_STRUCT));
     dataEncode((char *)pParam, sizeof(AUD_VOL_CUSTOM_STRUCT) + sizeof(int));
@@ -1787,7 +1787,7 @@ ACHStatus AudioCmdHandler::DLCustSPHWBParamToNV(void *pParam, int block)
         dataDecode((char *)pParam, size);
 
         dataLen = *((int *)pParam);
-        pCustomPara = (AUD_SPH_WB_PARAM_STRUCT *)(pParam + sizeof(int));
+        pCustomPara = (AUD_SPH_WB_PARAM_STRUCT *)( sizeof(int));
 
         if (dataLen != (size - sizeof(int)))
         {
@@ -1847,7 +1847,7 @@ ACHStatus AudioCmdHandler::DLCustSPHWBParamToNV(void *pParam, int block)
             SLOGV("WB speech out FIR Coefs ori=%d", pSPHWBPara->sph_wb_out_fir[0][i]);
         }
 
-        memcpy((void *)pSPHWBPara->sph_wb_out_fir, pParam + sizeof(int), sizeof(pSPHWBPara->sph_wb_out_fir));
+        memcpy((void *)pSPHWBPara->sph_wb_out_fir,  sizeof(int), sizeof(pSPHWBPara->sph_wb_out_fir));
 
         for (int i = 0; i < FIR_NUM_NB ;  i++)
         {
@@ -1873,7 +1873,7 @@ ACHStatus AudioCmdHandler::DLCustSPHWBParamToNV(void *pParam, int block)
         dataDecode((char *)pParam, size);
 
         dataLen = *((int *)pParam);
-        pFourCustomPara = (AUD_SPH_AFTER_FOUR_MODE_PARAM_STRUCT *)(pParam + sizeof(int));
+        pFourCustomPara = (AUD_SPH_AFTER_FOUR_MODE_PARAM_STRUCT *)( sizeof(int));
 
         if (dataLen != (size - sizeof(int)))
         {
@@ -1923,8 +1923,8 @@ ACHStatus AudioCmdHandler::ULCustSPHWBParamFromNV(void *pParam, int *len, int bl
 
     ALOGD("AudioCmdHandler::ULCustSPHWBParamFromNV() in");
 #ifdef MTK_WB_SPEECH_SUPPORT
-    AUD_SPH_WB_PARAM_STRUCT *pCustomPara = (AUD_SPH_WB_PARAM_STRUCT *)(pParam + sizeof(int));
-	AUD_SPH_AFTER_FOUR_MODE_PARAM_STRUCT *pFourCustomPara = (AUD_SPH_AFTER_FOUR_MODE_PARAM_STRUCT *)(pParam + sizeof(int));
+    AUD_SPH_WB_PARAM_STRUCT *pCustomPara = (AUD_SPH_WB_PARAM_STRUCT *)( sizeof(int));
+	AUD_SPH_AFTER_FOUR_MODE_PARAM_STRUCT *pFourCustomPara = (AUD_SPH_AFTER_FOUR_MODE_PARAM_STRUCT *)( sizeof(int));
     AUDIO_CUSTOM_WB_PARAM_STRUCT *pSPHWBPara = (AUDIO_CUSTOM_WB_PARAM_STRUCT *)malloc(sizeof(AUDIO_CUSTOM_WB_PARAM_STRUCT));
 
     if (pSPHWBPara == NULL)
@@ -2042,7 +2042,7 @@ ACHStatus AudioCmdHandler::DLCustHFPParamToNV(void *pParam)
 		 pHFPPara = NULL;
 		 return ACHFailed;
 	 }
-	 memcpy((void *)pHFPPara, pParam + sizeof(int), sizeof(AUDIO_HFP_PARAM_STRUCT));
+	 memcpy((void *)pHFPPara,  sizeof(int), sizeof(AUDIO_HFP_PARAM_STRUCT));
 
 
     for (int i = 0; i < 48; i++)
@@ -2094,7 +2094,7 @@ ACHStatus AudioCmdHandler::ULCustHFPParamFromNV(void *pParam, int *len)
     }
 
 	dataLen = sizeof(AUDIO_HFP_PARAM_STRUCT);
-	memcpy(pParam + sizeof(int), (void *)pHFPPara, dataLen);
+	memcpy( sizeof(int), (void *)pHFPPara, dataLen);
 	
 
     ALOGD("ULCustHFPParamFromNV the data sent to PC is %d", dataLen);
@@ -2139,7 +2139,7 @@ ACHStatus AudioCmdHandler::DLCustACFParamToNV(void *pParam)
     dataDecode((char *)pParam, size);
 
     dataLen = *((int *)pParam);
-    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)(pParam + sizeof(int));
+    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)( sizeof(int));
 
     if (dataLen != sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT))
     {
@@ -2376,7 +2376,7 @@ ACHStatus AudioCmdHandler::ULCustACFParamFromNV(void *pParam, int *len)
 #endif
 
     *((int *)pParam) = sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT);
-    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)(pParam + sizeof(int));
+    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)( sizeof(int));
 
     memcpy((void *)pCustomPara, (void *)pACFPara, sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT));
 
@@ -2429,7 +2429,7 @@ ACHStatus AudioCmdHandler::DLCustAudioFLTParamToNV(void *pParam,AudioFltTunningT
     dataDecode((char *)pParam, size);
 
     dataLen = *((int *)pParam);
-    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)(pParam + sizeof(int));
+    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)( sizeof(int));
 
     if (dataLen != sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT))
     {
@@ -2734,7 +2734,7 @@ ACHStatus AudioCmdHandler::ULCustAudioFLTParamFromNV(void *pParam, int *len,Audi
 #endif
 
     *((int *)pParam) = sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT);
-    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)(pParam + sizeof(int));
+    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)( sizeof(int));
 
     memcpy((void *)pCustomPara, (void *)pACFPara, sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT));
 
@@ -2811,7 +2811,7 @@ ACHStatus AudioCmdHandler::DLCustHCFParamToNV(void *pParam)
     dataDecode((char *)pParam, size);
 
     dataLen = *((int *)pParam);
-    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)(pParam + sizeof(int));
+    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)( sizeof(int));
 
     if (dataLen != sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT))
     {
@@ -3047,7 +3047,7 @@ ACHStatus AudioCmdHandler::ULCustHCFParamFromNV(void *pParam, int *len)
     }
 #endif
     *((int *)pParam) = sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT);
-    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)(pParam + sizeof(int));
+    pCustomPara = (AUDIO_ACF_CUSTOM_PARAM_STRUCT *)( sizeof(int));
 
     memcpy((void *)pCustomPara, (void *)pHCFPara, sizeof(AUDIO_ACF_CUSTOM_PARAM_STRUCT));
 
@@ -3075,7 +3075,7 @@ ACHStatus AudioCmdHandler::AudioTasteRunning(unsigned short cmdType, void *pPara
         dataDecode((char *)pParam, size);
 
         dataLen = *((int *)pParam);
-        size = 5 * sizeof(unsigned short) + strlen((char *)(pParam + 7 * sizeof(unsigned short))) + 1;
+        size = 5 * sizeof(unsigned short) + strlen((char *)( 7 * sizeof(unsigned short))) + 1;
         ALOGD("AudioTasteRunning() received data size is dataLen=%d, ori size is %d", dataLen, size);
         if (dataLen != size || (size > (5 * sizeof(unsigned short) + MAX_FILE_NAME_LEN)))
         {
@@ -3083,7 +3083,7 @@ ACHStatus AudioCmdHandler::AudioTasteRunning(unsigned short cmdType, void *pPara
             return ACHFailed;
         }
         sAudioTAsteParam.cmdType = cmdType;
-        memcpy((void *)&sAudioTAsteParam.selected_fir_index, pParam + sizeof(int), size);
+        memcpy((void *)&sAudioTAsteParam.selected_fir_index,  sizeof(int), size);
 
         ALOGD("AudioTasteRunning - cmd type=%d, mode=%d, wb_mode=%d", cmdType, sAudioTAsteParam.phone_mode, sAudioTAsteParam.wb_mode);
         ALOGD("AudioTasteRunning - index=%d, dl DG gain=%d, dl PGA=%d", sAudioTAsteParam.selected_fir_index, sAudioTAsteParam.dlDGGain, sAudioTAsteParam.dlPGA);
@@ -3147,7 +3147,7 @@ ACHStatus AudioCmdHandler::DLCustDualMicParamToNV(void *pParam, int block)
             return ACHFailed;
         }
 
-        memcpy((void *)pDualMicPara->ABF_para, pParam + sizeof(int), size);
+        memcpy((void *)pDualMicPara->ABF_para,  sizeof(int), size);
 
         for (int i = 0; i < NUM_ABF_PARAM + NUM_ABFWB_PARAM; i++)
         {
@@ -3169,7 +3169,7 @@ ACHStatus AudioCmdHandler::DLCustDualMicParamToNV(void *pParam, int block)
             return ACHFailed;
         }
 
-        memcpy((void *)pDualMicPara->ABF_para_LoudSPK, pParam + sizeof(int), size);
+        memcpy((void *)pDualMicPara->ABF_para_LoudSPK,  sizeof(int), size);
 
         for (int i = 0; i < NUM_ABF_PARAM + NUM_ABFWB_PARAM; i++)
         {
@@ -3256,7 +3256,7 @@ ACHStatus AudioCmdHandler::ULCustDualMicParamFromNV(void *pParam, int *len, int 
         }
 
         *((int *)pParam) = sizeof(pDualMicPara->ABF_para);
-        memcpy(pParam + sizeof(int), (void *)pDualMicPara->ABF_para, sizeof(pDualMicPara->ABF_para));
+        memcpy( sizeof(int), (void *)pDualMicPara->ABF_para, sizeof(pDualMicPara->ABF_para));
 
         dataEncode((char *)pParam, sizeof(pDualMicPara->ABF_para) + sizeof(int));
         *len = 2 * (sizeof(pDualMicPara->ABF_para) + sizeof(int));
@@ -3286,7 +3286,7 @@ ACHStatus AudioCmdHandler::ULCustDualMicParamFromNV(void *pParam, int *len, int 
 
         size = sizeof(AUDIO_CUSTOM_EXTRA_PARAM_STRUCT) - sizeof(pDualMicPara->ABF_para);
         *((int *)pParam) = size;
-        memcpy(pParam + sizeof(int), (void *)pDualMicPara->ABF_para_LoudSPK, size);
+        memcpy( sizeof(int), (void *)pDualMicPara->ABF_para_LoudSPK, size);
 
         dataEncode((char *)pParam, size + sizeof(int));
         *len = 2 * (size + sizeof(int));
@@ -3335,7 +3335,7 @@ ACHStatus AudioCmdHandler::AudioDMNRTuning(unsigned short cmdType, bool bWB, voi
             dataDecode((char *)pParam, size);
 
             dataLen = *((int *)pParam);
-            size = strlen((char *)(pParam + sizeof(int))) + 1;
+            size = strlen((char *)( sizeof(int))) + 1;
             if (dataLen != size)
             {
                 ALOGE("AudioDMNRTuning data miss !! dataLen=%d, size=%d", dataLen, size);
@@ -3344,7 +3344,7 @@ ACHStatus AudioCmdHandler::AudioDMNRTuning(unsigned short cmdType, bool bWB, voi
 
             cmdType = bWB ? (cmdType | 0x10) : (cmdType);
             sprintf(keyCmdType, "DUAL_MIC_REC_PLAY=%d", cmdType);
-            sprintf(keyOutputFileName, "DUAL_MIC_OUT_FILE_NAME=%s", (char *)(pParam + sizeof(int)));
+            sprintf(keyOutputFileName, "DUAL_MIC_OUT_FILE_NAME=%s", (char *)( sizeof(int)));
 
             AudioSystem::setParameters(0, String8(keyOutputFileName));
             AudioSystem::setParameters(0, String8(keyCmdType));
@@ -3359,7 +3359,7 @@ ACHStatus AudioCmdHandler::AudioDMNRTuning(unsigned short cmdType, bool bWB, voi
             dataDecode((char *)pParam, size);
 
             dataLen = *((int *)pParam);
-            pFileName = (DMNRTuningFileName *)(pParam + sizeof(int));
+            pFileName = (DMNRTuningFileName *)( sizeof(int));
             size = strlen(pFileName->input_file) + strlen(pFileName->output_file) + 2;
             if (dataLen != size)
             {
@@ -3419,7 +3419,7 @@ ACHStatus AudioCmdHandler::getDMNRGain(unsigned short cmdType, void *pParam, int
     ALOGD("getDMNRGain ori str:%s, new: %s, gain=%d", gainStr, pParamName, gain);
 
     *((int *)pParam) = sizeof(unsigned short);
-    *((unsigned short *)(pParam + sizeof(int))) = gain;
+    *((unsigned short *)( sizeof(int))) = gain;
 
     dataEncode((char *)pParam, sizeof(unsigned short) + sizeof(int));
     *len = 2 * (sizeof(unsigned short) + sizeof(int));
@@ -3579,7 +3579,7 @@ ACHStatus AudioCmdHandler::getGainInfoForDisp(void *pParam, int *len, int block)
 	}
 
     int size = 0;
-    void *pGainInfoCustomParam = (void *)((char *)pParam + sizeof(int));
+    void *pGainInfoCustomParam = (void *)((char *) sizeof(int));
 	void *pGainInfoCustomParamBegain = pGainInfoCustomParam;
     PCDispTotolStru *pGainInfoParam = (PCDispTotolStru *)malloc(sizeof(PCDispTotolStru));
 	memcpy((void *)pGainInfoParam, (void *)&mDispStru, sizeof(PCDispTotolStru));
@@ -3673,7 +3673,7 @@ ACHStatus AudioCmdHandler::ULCustGainParamFromNV(void *pParam, int *len, int blo
     }
 
     int size = 0;
-    void *pGainTableCustomParam = (void *)(pParam + sizeof(int));
+    void *pGainTableCustomParam = (void *)( sizeof(int));
 	void *pGainTableCustomParamBegain = pGainTableCustomParam;
     AUDIO_GAIN_TABLE_STRUCT *pGainTableParam = (AUDIO_GAIN_TABLE_STRUCT *)malloc(sizeof(AUDIO_GAIN_TABLE_STRUCT));
 
@@ -3781,7 +3781,7 @@ ACHStatus AudioCmdHandler::DLCustGainParamToNV(void *pParam, int block)
             return ACHFailed;
         }
 
-		memcpy((void *)pGainTableParam, pParam + sizeof(int), size);
+		memcpy((void *)pGainTableParam,  sizeof(int), size);
 	}
 	else if(block == 2)
 	{
@@ -3798,7 +3798,7 @@ ACHStatus AudioCmdHandler::DLCustGainParamToNV(void *pParam, int block)
             return ACHFailed;
         }
 
-		memcpy((void *)((void *)pGainTableParam + 12*sizeof(pGainTableParam->voiceCall)), pParam + sizeof(int), size);
+		memcpy((void *)((void *)pGainTableParam + 12*sizeof(pGainTableParam->voiceCall)),  sizeof(int), size);
 	}
 	else
 	{
@@ -3862,7 +3862,7 @@ ACHStatus AudioCmdHandler::getBtNrecInfoForDisp(void *pParam, int *len)
 	}
 
     int size = 0;
-    void *pGainInfoCustomParam = (void *)((char *)pParam + sizeof(int));
+    void *pGainInfoCustomParam = (void *)((char *) sizeof(int));
 	ALOGD("Get 1 DispItems");
 	memcpy(pGainInfoCustomParam, (void *)&mBtNrecDispItem, sizeof(PCDispItem));
 	size = sizeof(PCDispItem);
@@ -3927,7 +3927,7 @@ ACHStatus AudioCmdHandler::DLCustBtNrecParamToNV(void * pParam)
 		 pBTGainPara = NULL;
 		 return ACHFailed;
 	 }
-	 memcpy((void *)pBTGainPara, pParam + sizeof(int), sizeof(AUDIO_BT_GAIN_STRUCT));
+	 memcpy((void *)pBTGainPara,  sizeof(int), sizeof(AUDIO_BT_GAIN_STRUCT));
 
 
     write_size = SetAudioBTGainParamToNV(pBTGainPara);
@@ -3982,7 +3982,7 @@ ACHStatus AudioCmdHandler::ULCustBtNrecParamFromNV(void * pParam,int * len)
 	 }
 
 	dataLen = sizeof(AUDIO_BT_GAIN_STRUCT);
-	memcpy(pParam + sizeof(int), (void *)pBTGainPara, dataLen);
+	memcpy( sizeof(int), (void *)pBTGainPara, dataLen);
 	
 
     ALOGD("ULCustBTNRECParamFromNV the data sent to PC is %d", dataLen);
@@ -4034,7 +4034,7 @@ ACHStatus AudioCmdHandler::DLCustHDRecParamToNV(void *pParam, int block)
             return ACHFailed;
         }
 
-        memcpy((void *)(&pHDRecParam->hd_rec_mode_num), pParam + sizeof(int), size);
+        memcpy((void *)(&pHDRecParam->hd_rec_mode_num),  sizeof(int), size);
 
         ALOGD("HD Record parameters part 1 ~~~~~~~~~~~~~~~~");
     }
@@ -4057,7 +4057,7 @@ ACHStatus AudioCmdHandler::DLCustHDRecParamToNV(void *pParam, int block)
             return ACHFailed;
         }
 
-        memcpy((void *)pHDRecParam->hd_rec_fir, pParam + sizeof(int), size);
+        memcpy((void *)pHDRecParam->hd_rec_fir,  sizeof(int), size);
     }
     else if (block == 2)
     {
@@ -4077,7 +4077,7 @@ ACHStatus AudioCmdHandler::DLCustHDRecParamToNV(void *pParam, int block)
             return ACHFailed;
         }
 
-        memcpy((void *)pHDRecParam->hd_rec_fir[SPC_MAX_NUM_RECORD_INPUT_FIR / 2], pParam + sizeof(int), size);
+        memcpy((void *)pHDRecParam->hd_rec_fir[SPC_MAX_NUM_RECORD_INPUT_FIR / 2],  sizeof(int), size);
 #endif
     }
 
@@ -4125,7 +4125,7 @@ ACHStatus AudioCmdHandler::ULCustHDRecParamFromNV(void *pParam, int *len, int bl
     }
 
     int size = 0;
-    AUDIO_HD_RECORD_PARAM_STRUCT *pHDRecCustParam = (AUDIO_HD_RECORD_PARAM_STRUCT *)(pParam + sizeof(int));
+    AUDIO_HD_RECORD_PARAM_STRUCT *pHDRecCustParam = (AUDIO_HD_RECORD_PARAM_STRUCT *)( sizeof(int));
     AUDIO_HD_RECORD_PARAM_STRUCT *pHDRecParam = (AUDIO_HD_RECORD_PARAM_STRUCT *)malloc(sizeof(AUDIO_HD_RECORD_PARAM_STRUCT));
 
     ALOGD("ULCustHDRecParamFromNV ,HD record parameters size=%d", sizeof(AUDIO_HD_RECORD_PARAM_STRUCT));
@@ -4164,7 +4164,7 @@ ACHStatus AudioCmdHandler::ULCustHDRecParamFromNV(void *pParam, int *len, int bl
 #else
         size = sizeof(pHDRecParam->hd_rec_fir) / 2;
 #endif
-        memcpy(pParam + sizeof(int), (void *)pHDRecParam->hd_rec_fir, size);
+        memcpy( sizeof(int), (void *)pHDRecParam->hd_rec_fir, size);
     }
     else if (block == 2)
     {
@@ -4174,7 +4174,7 @@ ACHStatus AudioCmdHandler::ULCustHDRecParamFromNV(void *pParam, int *len, int bl
         ALOGD("HD Record parameters part 3 ~~~~~~~~~~~~~~~~");
         size = sizeof(AUDIO_HD_RECORD_PARAM_STRUCT) - 2 * sizeof(pHDRecParam->hd_rec_mode_num) - sizeof(pHDRecParam->hd_rec_speech_mode_para) - sizeof(pHDRecParam->hd_rec_fir) / 2;
 #endif
-        memcpy(pParam + sizeof(int), (void *)pHDRecParam->hd_rec_fir[SPC_MAX_NUM_RECORD_INPUT_FIR / 2], size);
+        memcpy( sizeof(int), (void *)pHDRecParam->hd_rec_fir[SPC_MAX_NUM_RECORD_INPUT_FIR / 2], size);
     }
     else
     {
@@ -4218,7 +4218,7 @@ ACHStatus AudioCmdHandler::DLCustHDRecSceTableToNV(void *pParam)
         return ACHFailed;
     }
 
-    AUDIO_HD_RECORD_SCENE_TABLE_STRUCT *pHDRecPara = (AUDIO_HD_RECORD_SCENE_TABLE_STRUCT *)(pParam + sizeof(int));
+    AUDIO_HD_RECORD_SCENE_TABLE_STRUCT *pHDRecPara = (AUDIO_HD_RECORD_SCENE_TABLE_STRUCT *)( sizeof(int));
     size = SetHdRecordSceneTableToNV(pHDRecPara);
     if (size != sizeof(AUDIO_HD_RECORD_SCENE_TABLE_STRUCT))
     {
@@ -4254,7 +4254,7 @@ ACHStatus AudioCmdHandler::ULCustHDRecSceTableFromNV(void *pParam, int *len)
     }
 
     int size = 0;
-    AUDIO_HD_RECORD_SCENE_TABLE_STRUCT *pHDRecPara = (AUDIO_HD_RECORD_SCENE_TABLE_STRUCT *)(pParam + sizeof(int));
+    AUDIO_HD_RECORD_SCENE_TABLE_STRUCT *pHDRecPara = (AUDIO_HD_RECORD_SCENE_TABLE_STRUCT *)( sizeof(int));
 
     ALOGD("ULCustHDRecSceTableFromNV ,HD record scene table size=%d", sizeof(AUDIO_HD_RECORD_SCENE_TABLE_STRUCT));
     size = GetHdRecordSceneTableFromNV(pHDRecPara);
@@ -4310,7 +4310,7 @@ ACHStatus AudioCmdHandler::DLCustHDRecHSParamToNV(void *pParam)
         return ACHFailed;
     }
 
-    AUDIO_HD_RECORD_48K_PARAM_STRUCT *pHDRecPara = (AUDIO_HD_RECORD_48K_PARAM_STRUCT *)(pParam + sizeof(int));
+    AUDIO_HD_RECORD_48K_PARAM_STRUCT *pHDRecPara = (AUDIO_HD_RECORD_48K_PARAM_STRUCT *)( sizeof(int));
     size = SetHdRecord48kParamToNV(pHDRecPara);
     if (size != sizeof(AUDIO_HD_RECORD_48K_PARAM_STRUCT))
     {
@@ -4344,7 +4344,7 @@ ACHStatus AudioCmdHandler::ULCustHDRecHSParamFromNV(void *pParam, int *len)
     }
 
     int size = 0;
-    AUDIO_HD_RECORD_48K_PARAM_STRUCT *pHDRecPara = (AUDIO_HD_RECORD_48K_PARAM_STRUCT *)(pParam + sizeof(int));
+    AUDIO_HD_RECORD_48K_PARAM_STRUCT *pHDRecPara = (AUDIO_HD_RECORD_48K_PARAM_STRUCT *)( sizeof(int));
 
     ALOGD("ULCustHDRecHSParamFromNV ,HD record scene table size=%d", sizeof(AUDIO_HD_RECORD_48K_PARAM_STRUCT));
     size = GetHdRecord48kParamFromNV(pHDRecPara);
@@ -4387,14 +4387,14 @@ ACHStatus AudioCmdHandler::HDRecording(int enable, void *pParam)
     {
         dataDecode((char *)pParam, size);
         dataLen = *((int *)pParam);
-        size = strlen((char *)(pParam + sizeof(int))) + 1;
+        size = strlen((char *)( sizeof(int))) + 1;
         if (dataLen != size)
         {
             ALOGE("HDRecording data miss !! dataLen=%d, size=%d", dataLen, size);
             return ACHFailed;
         }
 
-        sprintf(outputFileName, "HDRecVMFileName=%s", (char *)(pParam + sizeof(int)));
+        sprintf(outputFileName, "HDRecVMFileName=%s", (char *)( sizeof(int)));
         AudioSystem::setParameters(0, String8(outputFileName));
         ALOGD("HDRecording output file name:%s", outputFileName);
 
@@ -4464,7 +4464,7 @@ ACHStatus AudioCmdHandler::DLCustVOIPParamToNV(void *pParam)
             return ACHFailed;
         }
 
-        AUDIO_VOIP_PARAM_STRUCT *pVOIPPara = (AUDIO_VOIP_PARAM_STRUCT *)(pParam + sizeof(int));
+        AUDIO_VOIP_PARAM_STRUCT *pVOIPPara = (AUDIO_VOIP_PARAM_STRUCT *)( sizeof(int));
         size = SetAudioVoIPParamToNV(pVOIPPara);
         if (size != sizeof(AUDIO_VOIP_PARAM_STRUCT))
         {
@@ -4515,7 +4515,7 @@ ACHStatus AudioCmdHandler::ULCustVOIPParamFromNV(void *pParam, int *len)
     if (supportInfo & 0x40)
     {
         int size = 0;
-        AUDIO_VOIP_PARAM_STRUCT *pVOIPPara = (AUDIO_VOIP_PARAM_STRUCT *)(pParam + sizeof(int));
+        AUDIO_VOIP_PARAM_STRUCT *pVOIPPara = (AUDIO_VOIP_PARAM_STRUCT *)( sizeof(int));
 
         ALOGD("ULCustVOIPParamFromNV ,VOIP parameters size=%d", sizeof(AUDIO_VOIP_PARAM_STRUCT));
         size = GetAudioVoIPParamFromNV(pVOIPPara);

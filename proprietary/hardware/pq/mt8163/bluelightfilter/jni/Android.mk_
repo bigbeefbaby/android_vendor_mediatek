@@ -41,7 +41,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := jni_blf.cpp \
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE) \
-        $(MTK_PATH_SOURCE)/hardware/pq/mt8163/inc
+        $(MTK_PATH_SOURCE)/hardware/pq/mt6757/inc
 
 LOCAL_SHARED_LIBRARIES := \
 	libblf \

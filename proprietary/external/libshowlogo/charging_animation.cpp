@@ -570,7 +570,7 @@ void anim_surface_init(void)
     ANativeWindow* window = surface.get();
     err = window->dequeueBuffer(window, &buf, &fenceFd);
     sp<Fence> mFence(new Fence(fenceFd));
-    mFence->wait(Fence::TIMEOUT_NEVER);
+    //mFence->wait(Fence::TIMEOUT_NEVER);
     if(err){
          SLOGE("[libshowlogo: %s %d]%s\n",__FUNCTION__,__LINE__, strerror(-err));
     }

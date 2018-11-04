@@ -73,6 +73,16 @@ ifeq ($(TARGET_INCLUDE_GPS_SYMBOLS),true)
     include $(BUILD_SHARED_LIBRARY)
 endif
 
+ifeq ($(TARGET_INCLUDE_VTMAL_SYMBOLS),true)
+    include $(CLEAR_VARS)
+
+    LOCAL_SRC_FILES := vtmal.cpp
+    LOCAL_MODULE := libmtkshim_vtmal
+    LOCAL_PROPRIETARY_MODULE := true
+
+    include $(BUILD_SHARED_LIBRARY)
+endif
+
 ifeq ($(TARGET_INCLUDE_CAMERA_SYMBOLS),true)
     include $(CLEAR_VARS)
 
@@ -81,5 +91,5 @@ ifeq ($(TARGET_INCLUDE_CAMERA_SYMBOLS),true)
     LOCAL_MODULE := libmtkshim_camera
     LOCAL_PROPRIETARY_MODULE := true
 
-include $(BUILD_SHARED_LIBRARY)
+    include $(BUILD_SHARED_LIBRARY)
 endif

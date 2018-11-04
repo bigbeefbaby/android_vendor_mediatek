@@ -38,7 +38,7 @@
 # *************************************************************************
 SHELL        := /bin/bash
 MTK_PROJECT_NAME := $(subst full_,,$(TARGET_PRODUCT))
-PROJECT_FOLDER := $(shell find device/* -maxdepth 1 -name $(MTK_PROJECT_NAME))
+#PROJECT_FOLDER := $(shell find device/* -maxdepth 3 -name $(MTK_PROJECT_NAME))
 PRJ_MF := $(PROJECT_FOLDER)/ProjectConfig.mk
 include $(PRJ_MF)
 include vendor/mediatek/proprietary/scripts/check_dep/config.mak

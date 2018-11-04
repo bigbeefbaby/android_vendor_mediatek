@@ -37,7 +37,7 @@
 ################################################################################
 ifneq ($(strip $(MTK_EMULATOR_SUPPORT)),yes)
 
-# include a common mt8163 platform makefile
+# include a common mt6757 platform makefile
 sinclude $(TOP)/$(MTK_MTKCAM_PLATFORM)/mtkcam.mk
 $(warning "MTK_MTKCAM_PLATFORM:$(MTK_MTKCAM_PLATFORM)")
 ################################################################################

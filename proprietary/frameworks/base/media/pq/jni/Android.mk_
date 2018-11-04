@@ -58,7 +58,7 @@ ifeq ($(strip $(MTK_MIRAVISION_IMAGE_DC_SUPPORT)),yes)
     LOCAL_CFLAGS += -DMTK_MIRAVISION_IMAGE_DC_SUPPORT
 endif
 
-ifeq (,$(filter $(strip $(TARGET_BOARD_PLATFORM)), mt6572 mt6582 mt6592 mt8127 mt7623 mt8163 mt2601))
+ifeq (,$(filter $(strip $(TARGET_BOARD_PLATFORM)), mt6572 mt6582 mt6592 mt8127 mt7623 mt6757 mt2601))
     LOCAL_CFLAGS += -DJNI_PQ_PQSERVICE
 endif
 
@@ -74,18 +74,13 @@ LOCAL_C_INCLUDES:= \
 LOCAL_SHARED_LIBRARIES := \
     libutils \
     libcutils \
-    libpq_prot
 
-ifeq (,$(filter $(strip $(TARGET_BOARD_PLATFORM)), mt6572 mt6582 mt6592 mt8127 mt7623 mt8163 mt2601))
+ifeq (,$(filter $(strip $(TARGET_BOARD_PLATFORM)), mt6572 mt6582 mt6592 mt8127 mt7623 mt6757 mt2601))
     LOCAL_SHARED_LIBRARIES += \
         libpqservice \
         libbinder
 endif
 
-ifeq ($(MIRAVISION_API_SUPPORT),true)
-LOCAL_SHARED_LIBRARIES += \
-    libpq_cust
-endif
 
 LOCAL_PRELINK_MODULE := false
 LOCAL_MODULE := libjni_pq

@@ -42,6 +42,6 @@ endif
 $(xlog_filter_default_file): PRIVATE_SRC_FILES := $(xlog_filter_tags_src)
 $(xlog_filter_default_file): $(xlog_filter_tags_src)
 	mkdir -p $(dir $@)
-	$(MTK_ROOT)/external/libxlog/libxlog/merge-xlog-filter-tags.py $(PRIVATE_XLOG_FLAGS) -f $@ $(PRIVATE_SRC_FILES)
+	vendor/mediatek/proprietary/external/libxlog/libxlog/merge-xlog-filter-tags.py $(PRIVATE_XLOG_FLAGS) -f $@ $(PRIVATE_SRC_FILES)
 
 ALL_DEFAULT_INSTALLED_MODULES += $(xlog_filter_tags_file) $(xlog_filter_default_file) $(mtklog_config_prop_file)

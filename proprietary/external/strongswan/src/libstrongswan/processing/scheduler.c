@@ -195,7 +195,7 @@ void alarmsleep(private_scheduler_t * this)
 //	DBG1(DBG_JOB, "alarmsleep2 %ds %dns, result: %d",  tsa.tv_sec, tsa.tv_nsec, result);
 	this->condvar->broadcast(this->condvar);
 
-	return NULL;
+	//return NULL;
 }
 
 /**

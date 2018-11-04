@@ -598,7 +598,7 @@ static void DoCustSPHMagiParam(AudioCmdParam &audioCmdParams, void *pParam, Audi
         pSpeechParam = malloc(MAX_BUFSIZE_RECV);
         strcpy((char *)pSpeechParam, responseStr);
 
-		ret = pAudioHandle->ULCustSPHMagiParamFromNV(pSpeechParam + strLen, &dataLen);
+		ret = pAudioHandle->ULCustSPHMagiParamFromNV(strLen, &dataLen);
 
         if (ret == ACHSucceeded)
         {

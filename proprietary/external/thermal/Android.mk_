@@ -12,7 +12,8 @@ LOCAL_MODULE_TAGS:= optional
 
 LOCAL_SRC_FILES:= \
     thermal.c 
- 
+LOCAL_CFLAGS := -Wno-int-conversion
+
 LOCAL_C_INCLUDES = \
  $(LOCAL_PATH)/ \
  $(TOPDIR)/hardware/libhardware_legacy/include \

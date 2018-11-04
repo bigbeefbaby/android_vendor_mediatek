@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include $(CLEAR_VARS)
 LOCAL_PATH := $(call my-dir)
 
-include $(CLEAR_VARS)
 ifneq ($(findstring banyan, $(MTK_PROJECT)),)
 	LOCAL_SRC_FILES := WIFI_RAM_CODE_SOC
 	LOCAL_MODULE := $(LOCAL_SRC_FILES)

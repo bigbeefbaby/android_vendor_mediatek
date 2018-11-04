@@ -9,8 +9,8 @@
 #
 
 MTK_PROJECT_NAME := $(subst full_,,$(TARGET_PRODUCT))
-MTK_PROJECT_LOCATION := $(shell find device/* -maxdepth 1 -name $(MTK_PROJECT_NAME))
-PRJ_MF := $(MTK_PROJECT_LOCATION)/ProjectConfig.mk
+#MTK_PROJECT_LOCATION := $(shell find device/* -maxdepth 1 -name $(MTK_PROJECT_NAME))
+PRJ_MF := device/ulefone/t1/ProjectConfig.mk
 include $(PRJ_MF)
 
 export MTK_NAND_PAGE_SIZE

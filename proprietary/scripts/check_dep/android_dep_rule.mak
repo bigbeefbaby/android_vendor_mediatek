@@ -35,9 +35,10 @@
 # note: modem makefile operation is moved from mediatek/build/libs/custom.mk for AOSP use
 # get modem feature option
 ifneq ($(strip $(CUSTOM_MODEM)),)
-  mtk_modem_file := $(wildcard $(foreach m,$(CUSTOM_MODEM),$(MTK_ROOT)/modem/$(m)/modem_*_*_*.mak))
-  mtk_modem_feature_md :=
-  mtk_modem_feature_ap :=
+  mtk_modem_file := $(TOP)/$(MTK_PATH_SOURCE)/modem/agold_mt6757p_sp_ct5m_p15/APDB_MT6757_S01_alps-mp-n0.mp5_W17.32
+  #$(wildcard $(foreach m,$(CUSTOM_MODEM),$(MTK_ROOT)/modem/$(m)/modem_*_*_*_*.mak))
+  mtk_modem_feature_md := yes
+  mtk_modem_feature_ap := no
   ifeq ($(mtk_modem_file),)
     $(warning Warning: Invalid CUSTOM_MODEM = $(CUSTOM_MODEM) in ProjectConfig.mk)
     $(warning Cannot find $(foreach m,$(CUSTOM_MODEM),$(MTK_PATH_CUSTOM)/modem/$(m)) for modem_*_*_*.mak)

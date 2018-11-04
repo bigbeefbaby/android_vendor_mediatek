@@ -50,7 +50,6 @@ LOCAL_SHARED_LIBRARIES := \
     libcutils \
     libdl \
     libbinder \
-    libpq_prot \
 
 LOCAL_MODULE:= libpqservice
 

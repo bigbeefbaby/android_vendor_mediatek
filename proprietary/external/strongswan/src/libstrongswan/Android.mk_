@@ -42,6 +42,7 @@ utils/printf_hook/printf_hook_builtin.c utils/settings.c utils/test.c \
 utils/utils/strerror.c
 
 # adding the plugin source files
+LOCAL_CFLAGS := -Wno-return-type
 
 LOCAL_SRC_FILES += $(call add_plugin, aes)
 

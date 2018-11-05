@@ -51,7 +51,7 @@
 #include <cutils/sockets.h>
 #include <sys/capability.h>
 #include <linux/prctl.h>
-#include <librilmtk/ril_ex.h>
+#include <ril_ex.h>
 
 #include <private/android_filesystem_config.h>
 #include "hardware/qemu_pipe.h"
@@ -235,9 +235,9 @@ int main(int argc, char **argv)
         RLOGE("Max Number of rild's supported is: %d", MAX_RILDS);
         exit(0);
     }
-    if (strncmp(clientId, "0", MAX_CLIENT_ID_LENGTH)) {
+    /*if (strncmp(clientId, "0", MAX_CLIENT_ID_LENGTH)) {
         RIL_setRilSocketName(strncat(rild, clientId, MAX_SOCKET_NAME_LENGTH));
-    }
+    }*/
 
     if (rilLibPath == NULL) {
 #ifdef MTK_RIL_MD2
@@ -377,7 +377,7 @@ OpenLib:
         exit(EXIT_FAILURE);
     }
 
-    RIL_startEventLoop();
+    //RIL_startEventLoop();
 
     rilInitSocket = (const int(*)(void))dlsym(dlHandle, "RIL_InitSocket");
 
@@ -429,16 +429,16 @@ OpenLib:
     if (rilInitSocket == NULL) {
         RLOGD("Old vendor ril! so RIL_register is called");
         funcs = rilInit(&s_rilEnv, argc, rilArgv);
-        RIL_register(funcs);
+        //RIL_register(funcs);
     } else {
         RLOGD("New vendor ril! so RIL_registerSocket is called");
         funcsSocket = rilInitSocket(&s_rilEnvSocket, argc, rilArgv);
-        RIL_registerSocket(funcsSocket);
+        //RIL_registerSocket(funcsSocket);
     }
 
     if (rilUimInit) {
         RLOGD("RIL_register_socket started");
-        RIL_register_socket(rilUimInit, RIL_SAP_SOCKET, argc, rilArgv);
+        //RIL_register_socket(rilUimInit, RIL_SAP_SOCKET, argc, rilArgv);
     }
 
     RLOGD("RIL_register_socket completed");

@@ -95,6 +95,8 @@ LOCAL_C_INCLUDES += $(TOP)/$(MTK_PATH_CUSTOM_PLATFORM)/hal/inc \
 
 LOCAL_C_INCLUDES += $(TOP)/$(MTK_PATH_PLATFORM)/hardware/include
 
+LOCAL_CFLAGS += -Wno-c++11-narrowing
+#LOCAL_CFLAGS += -Wno-error=narrowing
 
 
 #//N:\code\0\DEV\L.AOSP.EARLY.MT6735.DEV\alps\vendor\mediatek\proprietary\platform\mt6735\hardware\include\D2\mtkcam\algorithm\lib3a

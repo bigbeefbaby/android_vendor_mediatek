@@ -6,6 +6,7 @@ PRODUCT_PACKAGES += \
     libmtkshim_omx \
     libmtkshim_gps \
 	libmtkshim_vtmal \
+	libmtkshim_rilproxy \
 	libmtkshim_program_binary_builder
 
 # Display

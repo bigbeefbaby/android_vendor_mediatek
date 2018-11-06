@@ -86,6 +86,14 @@ endif
 
 ifeq ($(TARGET_INCLUDE_FENCE_SYMBOLS),true)
   include $(CLEAR_VARS)
+  LOCAL_SRC_FILES := rilproxy.cpp
+  LOCAL_MODULE := libmtkshim_rilproxy
+  LOCAL_PROPRIETARY_MODULE := true
+  include $(BUILD_SHARED_LIBRARY)
+endif
+
+ifeq ($(TARGET_INCLUDE_FENCE_SYMBOLS),true)
+  include $(CLEAR_VARS)
   LOCAL_SRC_FILES := fence.cpp
   LOCAL_MODULE := libmtkshim_fence
   LOCAL_PROPRIETARY_MODULE := true

@@ -71,7 +71,7 @@ endif
 ifeq ($(TARGET_INCLUDE_PBBUILDER_SYMBOLS),true)
   include $(CLEAR_VARS)
   LOCAL_SRC_FILES := pbbuilder.cpp
-  LOCAL_MODULE := libmtkshim_program_binary_builder
+  LOCAL_MODULE := libmtkshim_pbbuilder
   LOCAL_PROPRIETARY_MODULE := true
   include $(BUILD_SHARED_LIBRARY)
 endif

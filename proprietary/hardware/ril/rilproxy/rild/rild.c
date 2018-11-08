@@ -1,41 +1,6 @@
-/* Copyright Statement:
- *
- * This software/firmware and related documentation ("MediaTek Software") are
- * protected under relevant copyright laws. The information contained herein
- * is confidential and proprietary to MediaTek Inc. and/or its licensors.
- * Without the prior written permission of MediaTek inc. and/or its licensors,
- * any reproduction, modification, use or disclosure of MediaTek Software,
- * and information contained herein, in whole or in part, shall be strictly prohibited.
- */
-/* MediaTek Inc. (C) 2010. All rights reserved.
- *
- * BY OPENING THIS FILE, RECEIVER HEREBY UNEQUIVOCALLY ACKNOWLEDGES AND AGREES
- * THAT THE SOFTWARE/FIRMWARE AND ITS DOCUMENTATIONS ("MEDIATEK SOFTWARE")
- * RECEIVED FROM MEDIATEK AND/OR ITS REPRESENTATIVES ARE PROVIDED TO RECEIVER ON
- * AN "AS-IS" BASIS ONLY. MEDIATEK EXPRESSLY DISCLAIMS ANY AND ALL WARRANTIES,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NONINFRINGEMENT.
- * NEITHER DOES MEDIATEK PROVIDE ANY WARRANTY WHATSOEVER WITH RESPECT TO THE
- * SOFTWARE OF ANY THIRD PARTY WHICH MAY BE USED BY, INCORPORATED IN, OR
- * SUPPLIED WITH THE MEDIATEK SOFTWARE, AND RECEIVER AGREES TO LOOK ONLY TO SUCH
- * THIRD PARTY FOR ANY WARRANTY CLAIM RELATING THERETO. RECEIVER EXPRESSLY ACKNOWLEDGES
- * THAT IT IS RECEIVER'S SOLE RESPONSIBILITY TO OBTAIN FROM ANY THIRD PARTY ALL PROPER LICENSES
- * CONTAINED IN MEDIATEK SOFTWARE. MEDIATEK SHALL ALSO NOT BE RESPONSIBLE FOR ANY MEDIATEK
- * SOFTWARE RELEASES MADE TO RECEIVER'S SPECIFICATION OR TO CONFORM TO A PARTICULAR
- * STANDARD OR OPEN FORUM. RECEIVER'S SOLE AND EXCLUSIVE REMEDY AND MEDIATEK'S ENTIRE AND
- * CUMULATIVE LIABILITY WITH RESPECT TO THE MEDIATEK SOFTWARE RELEASED HEREUNDER WILL BE,
- * AT MEDIATEK'S OPTION, TO REVISE OR REPLACE THE MEDIATEK SOFTWARE AT ISSUE,
- * OR REFUND ANY SOFTWARE LICENSE FEES OR SERVICE CHARGE PAID BY RECEIVER TO
- * MEDIATEK FOR SUCH MEDIATEK SOFTWARE AT ISSUE.
- *
- * The following software/firmware and/or related documentation ("MediaTek Software")
- * have been modified by MediaTek Inc. All revisions are subject to any receiver's
- * applicable license agreements with MediaTek Inc.
- */
-
 /* //device/system/rild/rild.c
 **
-** Copyright 2006, The Android Open Source Project
+** Copyright 2006 The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -58,79 +23,63 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <sys/mman.h>
-#include <time.h>
 
 #include <telephony/ril.h>
-
-#include <rild.h>
-
-#ifdef MTK_RIL_MD2
-#define LOG_TAG "RILDMD2"
-#else
 #define LOG_TAG "RILD"
-#endif
-
 #include <utils/Log.h>
 #include <cutils/properties.h>
 #include <cutils/sockets.h>
 #include <sys/capability.h>
-#include <linux/prctl.h>
+#include <sys/prctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <libril/ril_ex.h>
 
 #include <private/android_filesystem_config.h>
+#include "hardware/qemu_pipe.h"
 
-#define SOC_PATH_PROPERTY  "rild.modem.socket"
-
-#ifdef MTK_RIL_MD2
-#define LIB_PATH_PROPERTY   "rild.libpath.md2"
-#define LIB_ARGS_PROPERTY   "rild.libargs.md2"
-#else
 #define LIB_PATH_PROPERTY   "rild.libpath"
 #define LIB_ARGS_PROPERTY   "rild.libargs"
-#endif
-
 #define MAX_LIB_ARGS        16
 
-static void usage(const char *argv0)
-{
+static void usage(const char *argv0) {
     fprintf(stderr, "Usage: %s -l <ril impl library> [-- <args for impl library>]\n", argv0);
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
+
+extern char rild[MAX_SOCKET_NAME_LENGTH];
 
 extern void RIL_register (const RIL_RadioFunctions *callbacks);
 
-extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
-                           void *response, size_t responselen);
+extern void RIL_register_socket (RIL_RadioFunctions *(*rilUimInit)
+        (const struct RIL_Env *, int, char **), RIL_SOCKET_TYPE socketType, int argc, char **argv);
 
+extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
+        void *response, size_t responselen);
+
+extern void RIL_setRilSocketName(char *);
+
+#if defined(ANDROID_MULTI_SIM)
 extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
-                                size_t datalen, RILId id);
+        size_t datalen, RIL_SOCKET_ID socket_id);
+#else
+extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
+        size_t datalen);
+#endif
 
 extern void RIL_requestTimedCallback (RIL_TimedCallback callback,
-                               void *param, const struct timeval *relativeTime);
-
-#ifdef MTK_RIL
-extern void RIL_requestProxyTimedCallback (RIL_TimedCallback callback,
-                               void *param, const struct timeval *relativeTime, int proxyId);
-extern RILChannelId RIL_queryMyChannelId(RIL_Token t);
-extern int RIL_queryMyProxyIdByThread();
-#endif 
+        void *param, const struct timeval *relativeTime);
 
 
 static struct RIL_Env s_rilEnv = {
     RIL_onRequestComplete,
     RIL_onUnsolicitedResponse,
     RIL_requestTimedCallback
-#ifdef MTK_RIL
-    ,RIL_requestProxyTimedCallback
-    ,RIL_queryMyChannelId
-    ,RIL_queryMyProxyIdByThread
-#endif 
 };
 
 extern void RIL_startEventLoop();
 
-static int make_argv(char * args, char ** argv)
-{
+static int make_argv(char * args, char ** argv) {
     // Note: reserve argv[0]
     int count = 1;
     char * tok;
@@ -149,38 +98,69 @@ static int make_argv(char * args, char ** argv)
  * Our group, cache, was set by init.
  */
 void switchUser() {
+    char debuggable[PROP_VALUE_MAX];
+
     prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
     setuid(AID_RADIO);
 
     struct __user_cap_header_struct header;
-    struct __user_cap_data_struct cap;
-    header.version = _LINUX_CAPABILITY_VERSION;
+    memset(&header, 0, sizeof(header));
+    header.version = _LINUX_CAPABILITY_VERSION_3;
     header.pid = 0;
-    cap.effective = cap.permitted = 1 << CAP_NET_ADMIN;
-    cap.inheritable = 0;
-    capset(&header, &cap);
+
+    struct __user_cap_data_struct data[2];
+    memset(&data, 0, sizeof(data));
+
+    data[CAP_TO_INDEX(CAP_NET_ADMIN)].effective |= CAP_TO_MASK(CAP_NET_ADMIN);
+    data[CAP_TO_INDEX(CAP_NET_ADMIN)].permitted |= CAP_TO_MASK(CAP_NET_ADMIN);
+
+    data[CAP_TO_INDEX(CAP_NET_RAW)].effective |= CAP_TO_MASK(CAP_NET_RAW);
+    data[CAP_TO_INDEX(CAP_NET_RAW)].permitted |= CAP_TO_MASK(CAP_NET_RAW);
+
+    if (capset(&header, &data[0]) == -1) {
+        RLOGE("capset failed: %s", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    /*
+     * Debuggable build only:
+     * Set DUMPABLE that was cleared by setuid() to have tombstone on RIL crash
+     */
+    property_get("ro.debuggable", debuggable, "0");
+    if (strcmp(debuggable, "1") == 0) {
+        prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
+    }
 }
 
-int main(int argc, char **argv)
-{
+void signal_treatment(int param) {
+    RLOGD("signal_no=%d", param);
+    switch (param) {
+        case SIGPIPE:
+            break;
+        default:
+            exit(0);
+            break;
+    }
+}
+
+int main(int argc, char **argv) {
     const char * rilLibPath = NULL;
     char **rilArgv;
     void *dlHandle;
     const RIL_RadioFunctions *(*rilInit)(const struct RIL_Env *, int, char **);
+    const RIL_RadioFunctions *(*rilUimInit)(const struct RIL_Env *, int, char **);
+    char *err_str = NULL;
+
     const RIL_RadioFunctions *funcs;
     char libPath[PROPERTY_VALUE_MAX];
-    char socPath[PROPERTY_VALUE_MAX];
     unsigned char hasLibArgs = 0;
 
     int i;
+    const char *clientId = NULL;
+    RLOGD("**RIL Proxy Started**");
+    RLOGD("**RILd param count=%d**", argc);
 
-#ifdef MTK_RIL_MD2
-    LOGD("RILD started (MD2)");
-#else
-    LOGD("RILD started");
-#endif
-
-    if (mtkInit() == -1) goto done;
+    signal(SIGPIPE, signal_treatment);
 
     umask(S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
     for (i = 1; i < argc ;) {
@@ -191,17 +171,25 @@ int main(int argc, char **argv)
             i++;
             hasLibArgs = 1;
             break;
+        } else if (0 == strcmp(argv[i], "-c") &&  (argc - i > 1)) {
+            clientId = argv[i+1];
+            i += 2;
         } else {
             usage(argv[0]);
         }
     }
+    if (clientId == NULL) {
+        clientId = "0";
+    } else if (atoi(clientId) >= MAX_RILDS) {
+        RLOGE("Max Number of rild's supported is: %d", MAX_RILDS);
+        exit(0);
+    }
+    if (strncmp(clientId, "0", MAX_CLIENT_ID_LENGTH)) {
+        RIL_setRilSocketName(strncat(rild, clientId, MAX_SOCKET_NAME_LENGTH));
+    }
 
     if (rilLibPath == NULL) {
-#ifdef MTK_RIL_MD2
-        if ( 0 == property_get(LIB_PATH_PROPERTY, libPath, "/system/lib/mtk-rilmd2.so")) {
-#else
-        if ( 0 == property_get(LIB_PATH_PROPERTY, libPath, "/system/lib/mtk-ril.so")) {
-#endif
+        if ( 0 == property_get(LIB_PATH_PROPERTY, libPath, NULL)) {
             // No lib sepcified on the command line, and nothing set in props.
             // Assume "no-ril" case.
             goto done;
@@ -209,26 +197,23 @@ int main(int argc, char **argv)
             rilLibPath = libPath;
         }
     }
-
+	RLOGD("rilLibPath:%s", rilLibPath);
     /* special override when in the emulator */
 #if 1
     {
-        static char*  arg_overrides[3];
+        static char*  arg_overrides[5];
         static char   arg_device[32];
         int           done = 0;
 
-#ifdef MTK_RIL_MD2
-#define  REFERENCE_RIL_PATH  "/system/lib/mtk-rilmd2.so"
-#else
-#define  REFERENCE_RIL_PATH  "/system/lib/mtk-ril.so"
-#endif
+#define  REFERENCE_RIL_PATH  "libreference-ril.so"
+
         /* first, read /proc/cmdline into memory */
         char          buffer[1024], *p, *q;
         int           len;
         int           fd = open("/proc/cmdline",O_RDONLY);
 
         if (fd < 0) {
-            LOGD("could not open /proc/cmdline:%s", strerror(errno));
+            RLOGD("could not open /proc/cmdline:%s", strerror(errno));
             goto OpenLib;
         }
 
@@ -237,7 +222,7 @@ int main(int argc, char **argv)
         while (len == -1 && errno == EINTR);
 
         if (len < 0) {
-            LOGD("could not read /proc/cmdline:%s", strerror(errno));
+            RLOGD("could not read /proc/cmdline:%s", strerror(errno));
             close(fd);
             goto OpenLib;
         }
@@ -256,38 +241,30 @@ int main(int argc, char **argv)
 
                 sleep(1);
 
-                fd = socket_local_client(
-                            QEMUD_SOCKET_NAME,
-                            ANDROID_SOCKET_NAMESPACE_RESERVED,
-                            SOCK_STREAM );
-
+                fd = qemu_pipe_open("qemud:gsm");
+                if (fd < 0) {
+                    fd = socket_local_client(
+                                QEMUD_SOCKET_NAME,
+                                ANDROID_SOCKET_NAMESPACE_RESERVED,
+                                SOCK_STREAM );
+                }
                 if (fd >= 0) {
                     close(fd);
                     snprintf( arg_device, sizeof(arg_device), "%s/%s",
                                 ANDROID_SOCKET_DIR, QEMUD_SOCKET_NAME );
 
-                    if (property_get(SOC_PATH_PROPERTY, socPath, NULL) == 0) 
-                    {
-                        arg_overrides[1] = "-s";
-                        arg_overrides[2] = arg_device;
-                        done = 1;
-                        break;
-                    }
-                    else
-                    {
-                        arg_overrides[1] = "-m";
-                        arg_overrides[2] = socPath;
-                        done = 1;
-                        break;
-                    }
+                    arg_overrides[1] = "-s";
+                    arg_overrides[2] = arg_device;
+                    done = 1;
+                    break;
                 }
-                LOGD("could not connect to %s socket: %s",
+                RLOGD("could not connect to %s socket: %s",
                     QEMUD_SOCKET_NAME, strerror(errno));
                 if (--tries == 0)
                     break;
             }
             if (!done) {
-                LOGE("could not connect to %s socket (giving up): %s",
+                RLOGE("could not connect to %s socket (giving up): %s",
                     QEMUD_SOCKET_NAME, strerror(errno));
                 while(1)
                     sleep(0x00ffffff);
@@ -323,32 +300,40 @@ int main(int argc, char **argv)
             hasLibArgs = 1;
             rilLibPath = REFERENCE_RIL_PATH;
 
-            LOGD("overriding with %s %s", arg_overrides[1], arg_overrides[2]);
+            RLOGD("overriding with %s %s", arg_overrides[1], arg_overrides[2]);
         }
     }
 OpenLib:
 #endif
     switchUser();
 
-#ifdef MTK_RIL_MD2
-    rilLibPath = "/system/lib/mtk-rilmd2.so";
-#endif
-    LOGD("Open ril lib path: %s", rilLibPath);
-
     dlHandle = dlopen(rilLibPath, RTLD_NOW);
 
     if (dlHandle == NULL) {
-        fprintf(stderr, "dlopen failed: %s\n", dlerror());
-        exit(-1);
+        RLOGE("dlopen failed: %s", dlerror());
+        exit(EXIT_FAILURE);
     }
 
     RIL_startEventLoop();
 
-    rilInit = (const RIL_RadioFunctions *(*)(const struct RIL_Env *, int, char **))dlsym(dlHandle, "RIL_Init");
+    rilInit =
+        (const RIL_RadioFunctions *(*)(const struct RIL_Env *, int, char **))
+        dlsym(dlHandle, "RIL_Init");
 
     if (rilInit == NULL) {
-        fprintf(stderr, "RIL_Init not defined or exported in %s\n", rilLibPath);
-        exit(-1);
+        RLOGE("RIL_Init not defined or exported in %s\n", rilLibPath);
+        exit(EXIT_FAILURE);
+    }
+
+    dlerror(); // Clear any previous dlerror
+    rilUimInit =
+        (const RIL_RadioFunctions *(*)(const struct RIL_Env *, int, char **))
+        dlsym(dlHandle, "RIL_SAP_Init");
+    err_str = dlerror();
+    if (err_str) {
+        RLOGW("RIL_SAP_Init not defined or exported in %s: %s\n", rilLibPath, err_str);
+    } else if (!rilUimInit) {
+        RLOGW("RIL_SAP_Init defined as null in %s. SAP Not usable\n", rilLibPath);
     }
 
     if (hasLibArgs) {
@@ -358,26 +343,35 @@ OpenLib:
         static char * newArgv[MAX_LIB_ARGS];
         static char args[PROPERTY_VALUE_MAX];
         rilArgv = newArgv;
-#ifdef MTK_RIL_MD2
-        property_get(LIB_ARGS_PROPERTY, args, "-d /dev/ccci2_tty0");
-#else
-        property_get(LIB_ARGS_PROPERTY, args, "-d /dev/ttyC0");
-#endif
+        property_get(LIB_ARGS_PROPERTY, args, "");
         argc = make_argv(args, rilArgv);
     }
+
+    rilArgv[argc++] = "-c";
+    rilArgv[argc++] = clientId;
+    RLOGD("RIL_Init argc = %d clientId = %s", argc, rilArgv[argc-1]);
 
     // Make sure there's a reasonable argv[0]
     rilArgv[0] = argv[0];
 
     funcs = rilInit(&s_rilEnv, argc, rilArgv);
+    RLOGD("RIL_Init rilInit completed");
 
     RIL_register(funcs);
 
+    RLOGD("RIL_Init RIL_register completed");
+
+    if (rilUimInit) {
+        RLOGD("RIL_register_socket started");
+        RIL_register_socket(rilUimInit, RIL_SAP_SOCKET, argc, rilArgv);
+    }
+
+    RLOGD("RIL_register_socket completed");
+
 done:
 
-    while(1) {
-        // sleep(UINT32_MAX) seems to return immediately on bionic
-        sleep(0x00ffffff);
+    RLOGD("RIL_Init starting sleep loop");
+    while (true) {
+        sleep(UINT32_MAX);
     }
 }
-

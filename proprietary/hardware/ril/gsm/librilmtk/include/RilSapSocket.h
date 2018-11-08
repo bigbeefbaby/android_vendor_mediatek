@@ -20,7 +20,7 @@
 //#include "telephony/ril.h"
 #include <telephony/mtk_ril.h>
 #include "RilSocket.h"
-#include <hardware/ril/librilutils/proto/sap-api.pb.h>
+
 
 /**
  * RilSapSocket is a derived class, derived from the RilSocket abstract

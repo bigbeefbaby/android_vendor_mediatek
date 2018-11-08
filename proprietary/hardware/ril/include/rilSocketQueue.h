@@ -16,7 +16,7 @@
 
 #include "pb_decode.h"
 #include <pthread.h>
-#include <hardware/ril/librilutils/proto/sap-api.pb.h>
+
 #include <utils/Log.h>
 
 using namespace std;
@@ -82,7 +82,7 @@ class Ril_queue {
          * @param Request message id.
          * @param Request token.
          */
-        int checkAndDequeue( MsgId id, int token);
+        int checkAndDequeue(int id, int token);
 
        /**
          * Queue constructor.
@@ -134,7 +134,7 @@ void Ril_queue<T>::enqueue(T* request) {
 }
 
 template <typename T>
-int Ril_queue<T>::checkAndDequeue(MsgId id, int token) {
+int Ril_queue<T>::checkAndDequeue(int id, int token) {
     int ret = 0;
     T* temp;
 

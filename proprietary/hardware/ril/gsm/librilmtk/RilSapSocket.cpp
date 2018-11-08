@@ -42,19 +42,21 @@ void ril_sap_on_unsolicited_response (
 extern "C" void
 RIL_requestTimedCallback (RIL_TimedCallback callback, void *param,
         const struct timeval *relativeTime);
-/*extern "C" void
+extern "C" void
 RIL_requestProxyTimedCallback (RIL_TimedCallback callback,
-        void *param, const struct timeval *relativeTime, int proxyId);*/
-//extern "C" RILChannelId RIL_queryMyChannelId(RIL_Token t);
-//extern "C" int RIL_queryMyProxyIdByThread();
+        void *param, const struct timeval *relativeTime, int proxyId);
+extern "C" RILChannelId RIL_queryMyChannelId(RIL_Token t);
+extern "C" int RIL_queryMyProxyIdByThread();
 
 struct RIL_EnvSocket RilSapSocket::uimRilEnv = {
         .OnRequestComplete = RilSapSocket::sOnRequestComplete,
         .OnUnsolicitedResponse = RilSapSocket::sOnUnsolicitedResponse,
         .RequestTimedCallback = RIL_requestTimedCallback
-        //,.RequestProxyTimedCallback = RIL_requestProxyTimedCallback
-        //,.QueryMyChannelId = RIL_queryMyChannelId
-        //,.QueryMyProxyIdByThread = RIL_queryMyProxyIdByThread
+    #ifdef MTK_RIL
+        ,.RequestProxyTimedCallback = RIL_requestProxyTimedCallback
+        ,.QueryMyChannelId = RIL_queryMyChannelId
+        ,.QueryMyProxyIdByThread = RIL_queryMyProxyIdByThread
+    #endif
 };
 
 void RilSapSocket::sOnRequestComplete (RIL_Token t,
@@ -77,6 +79,7 @@ void RilSapSocket::sOnRequestComplete (RIL_Token t,
     }
 }
 
+#if defined(ANDROID_MULTI_SIM)
 void RilSapSocket::sOnUnsolicitedResponse(int unsolResponse,
         const void *data,
         size_t datalen,
@@ -86,6 +89,14 @@ void RilSapSocket::sOnUnsolicitedResponse(int unsolResponse,
         sap_socket->onUnsolicitedResponse(unsolResponse, (void *)data, datalen);
     }
 }
+#else
+void RilSapSocket::sOnUnsolicitedResponse(int unsolResponse,
+       const void *data,
+       size_t datalen) {
+    RilSapSocket *sap_socket = getSocketById(RIL_SOCKET_1);
+    sap_socket->onUnsolicitedResponse(unsolResponse, (void *)data, datalen);
+}
+#endif
 
 void RilSapSocket::printList() {
     RilSapSocketList *current = head;
@@ -290,7 +301,11 @@ void RilSapSocket::dispatchRequest(MsgHeader *req) {
         req->id,
         req->error );
 
+#if defined(ANDROID_MULTI_SIM)
         uimFuncs->onRequest(req->id, req->payload->bytes, req->payload->size, currRequest, id);
+#else
+        uimFuncs->onRequest(req->id, req->payload->bytes, req->payload->size, currRequest);
+#endif
     }
 }
 
@@ -463,7 +478,11 @@ void RilSapSocket::dispatchDisconnect(MsgHeader *req) {
 
     RLOGD("Sending disconnect on command close!");
 
+#if defined(ANDROID_MULTI_SIM)
     uimFuncs->onRequest(req->id, req->payload->bytes, req->payload->size, currRequest, id);
+#else
+    uimFuncs->onRequest(req->id, req->payload->bytes, req->payload->size, currRequest);
+#endif
 }
 
 void RilSapSocket::onCommandsSocketClosed() {

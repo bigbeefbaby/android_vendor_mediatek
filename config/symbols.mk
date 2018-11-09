@@ -22,7 +22,7 @@ LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/bin/program
 #endif
 #ifeq ($(TARGET_INCLUDE_VTMAL_SYMBOLS),true)
 LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/lib/libvtmal.so|libmtkshim_vtmal.so:/system/vendor/lib/libvtmal.so|libvt_custom.so:/system/vendor/bin/vtservice|libmtkshim_vtmal.so
-#$(error $(LINKER_FORCED_SHIM_LIBS))
+$(info "$(LINKER_FORCED_SHIM_LIBS)")
 #endif
 #ifeq ($(TARGET_INCLUDE_CAMERA_SYMBOLS),true)
 #LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/lib/libfeatureio.so|libmtkshim_camera.so:/system/vendor/lib64/libfeatureio.so|libmtkshim_camera.so:/system/vendor/lib/libcam.camnode.so|libmtkshim_camera.so:/system/vendor/lib64/libcam.camnode.so|libmtkshim_camera.so

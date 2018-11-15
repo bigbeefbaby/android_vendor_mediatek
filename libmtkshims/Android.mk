@@ -52,6 +52,7 @@ endif
 ifeq ($(TARGET_INCLUDE_GPS_SYMBOLS),true)
     include $(CLEAR_VARS)
     LOCAL_SRC_FILES := \
+        agps/icu55.c \
         agps/icu53.c \
         agps/ssl.c
     LOCAL_SHARED_LIBRARIES := libicuuc libssl

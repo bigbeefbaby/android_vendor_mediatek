@@ -86,14 +86,6 @@ endif
 
 ifeq ($(TARGET_INCLUDE_FENCE_SYMBOLS),true)
   include $(CLEAR_VARS)
-  LOCAL_SRC_FILES := rilproxy.cpp
-  LOCAL_MODULE := libmtkshim_rilproxy
-  LOCAL_PROPRIETARY_MODULE := true
-  include $(BUILD_SHARED_LIBRARY)
-endif
-
-ifeq ($(TARGET_INCLUDE_FENCE_SYMBOLS),true)
-  include $(CLEAR_VARS)
   LOCAL_SRC_FILES := fence.cpp
   LOCAL_MODULE := libmtkshim_fence
   LOCAL_PROPRIETARY_MODULE := true
@@ -102,7 +94,7 @@ endif
 
 ifeq ($(TARGET_INCLUDE_CAMERA_SYMBOLS),true)
     include $(CLEAR_VARS)
-    LOCAL_SRC_FILES := camera.cpp
+    LOCAL_SRC_FILES := cam.cpp camera.cpp camhack.cpp
     LOCAL_SHARED_LIBRARIES := libdpframework
     LOCAL_MODULE := libmtkshim_camera
     LOCAL_PROPRIETARY_MODULE := true

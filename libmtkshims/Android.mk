@@ -55,7 +55,7 @@ ifeq ($(TARGET_INCLUDE_GPS_SYMBOLS),true)
         agps/icu55.c \
         agps/icu53.c \
         agps/ssl.c
-    LOCAL_SHARED_LIBRARIES := libicuuc libssl libmtk-rilproxy
+    LOCAL_SHARED_LIBRARIES := libicuuc libssl
     LOCAL_MODULE := libmtkshim_gps
     LOCAL_PROPRIETARY_MODULE := true
     include $(BUILD_SHARED_LIBRARY)

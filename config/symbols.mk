@@ -21,11 +21,12 @@ ifeq ($(TARGET_INCLUDE_PBBUILDER_SYMBOLS),true)
 LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/bin/program_binary_builder|libmtkshim_pbbuilder.so:/system/vendor/lib/libprogrambinary.so:libmtkshim_pbbuilder.so:/system/vendor/lib64/libprogrambinary.so:libmtkshim_pbbuilder.so
 endif
 ifeq ($(TARGET_INCLUDE_VTMAL_SYMBOLS),true)
-LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/lib/libvtmal.so|libmtkshim_vtmal.so:/system/vendor/lib/libvtmal.so|libvt_custom.so:/system/vendor/bin/vtservice|libmtkshim_vtmal.so
+LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/lib/libvtmal.so|libmtkshim_vtmal.so:/system/vendor/bin/vtservice|libmtkshim_vtmal.so
+endif
+ifeq ($(TARGET_INCLUDE_MEDIAJNI_SYMBOLS),true)
+LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/lib/libmedia_jni.so|libmtkshim_mediajni.so:/system/lib64/libmedia_jni.so|libmtkshim_mediajni.so
 endif
 ifeq ($(TARGET_INCLUDE_CAMERA_SYMBOLS),true)
 LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/lib/libfeatureio.so|libmtkshim_camera.so:/system/vendor/lib64/libfeatureio.so|libmtkshim_camera.so:/system/vendor/lib/libcam.camnode.so|libmtkshim_camera.so:/system/vendor/lib64/libcam.camnode.so|libmtkshim_camera.so
 endif
 #LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/lib/libmal_rilproxy.so|mtk-rilproxy.so:/system/vendor/lib64/libmal_rilproxy.so|mtk-rilproxy.so
-
-

@@ -85,6 +85,14 @@ ifeq ($(TARGET_INCLUDE_PARCEL_SYMBOLS),true)
   include $(BUILD_SHARED_LIBRARY)
 endif
 
+ifeq ($(TARGET_INCLUDE_MEDIAJNI_SYMBOLS),true)
+  include $(CLEAR_VARS)
+  LOCAL_SRC_FILES := mediajni.cpp
+  LOCAL_MODULE := libmtkshim_mediajni
+  LOCAL_PROPRIETARY_MODULE := true
+  include $(BUILD_SHARED_LIBRARY)
+endif
+
 ifeq ($(TARGET_INCLUDE_FENCE_SYMBOLS),true)
   include $(CLEAR_VARS)
   LOCAL_SRC_FILES := fence.cpp

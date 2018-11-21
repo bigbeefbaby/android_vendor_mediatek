@@ -6,7 +6,8 @@ PRODUCT_PACKAGES += \
     libmtkshim_omx \
     libmtkshim_gps \
 	libmtkshim_vtmal \
-	libmtkshim_pbbuilder
+	libmtkshim_pbbuilder \
+	libmtkshim_mediajni \
 
 # Display
 PRODUCT_PACKAGES += \

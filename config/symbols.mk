@@ -15,7 +15,7 @@ ifeq ($(TARGET_INCLUDE_OMX_SYMBOLS),true)
 LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/lib/libMtkOmxVdec.so|libmtkshim_omx.so
 endif
 ifeq ($(TARGET_INCLUDE_GPS_SYMBOLS),true)
-LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/bin/mtk_agpsd|libmtkshim_gps.so
+LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/bin/mtk_agpsd|libmtkshim_gps.so:/system/vendor/bin/volte_imcb|libmtk_vt_service.so:/system/vendor/bin/mtk_agpsd|mtk-rilproxy.so:/system/vendor/bin/mtk_agpsd|gps.mt6757.so:/system/vendor/bin/mtk_agpsd|libviagpsrpc.so:/system/vendor/lib64/libmal_rilproxy.so|mtk-ril.so:/system/vendor/lib64/libmal_rilproxy.so|mtk-rilproxy.so
 endif
 ifeq ($(TARGET_INCLUDE_PBBUILDER_SYMBOLS),true)
 LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/bin/program_binary_builder|libmtkshim_pbbuilder.so
@@ -29,7 +29,3 @@ endif
 ifeq ($(TARGET_INCLUDE_CAMERA_SYMBOLS),true)
 LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/lib/libfeatureio.so|libmtkshim_camera.so:/system/vendor/lib64/libfeatureio.so|libmtkshim_camera.so:/system/vendor/lib/libcam.camnode.so|libmtkshim_camera.so:/system/vendor/lib64/libcam.camnode.so|libmtkshim_camera.so
 endif
-
-#LINKER_FORCED_SHIM_LIBS := $(LINKER_FORCED_SHIM_LIBS):/system/vendor/bin/volte_imcb|libmtk_vt_service.so:/system/vendor/bin/mtk_agpsd|mtk-rilproxy.so:/system/vendor/bin/mtk_agpsd|gps.mt6757.so:/system/vendor/bin/mtk_agpsd|libviagpsrpc.so
-
-

@@ -51,11 +51,8 @@ endif
 # gps symbols
 ifeq ($(TARGET_INCLUDE_GPS_SYMBOLS),true)
     include $(CLEAR_VARS)
-    LOCAL_SRC_FILES := \
-        agps/icu55.c \
-        agps/icu53.c \
-        agps/ssl.c
-    LOCAL_SHARED_LIBRARIES := libicuuc libssl
+    LOCAL_SRC_FILES := ril.cpp \
+    LOCAL_SHARED_LIBRARIES := libicuuc libssl libmal_rilproxy
     LOCAL_MODULE := libmtkshim_gps
     LOCAL_PROPRIETARY_MODULE := true
     include $(BUILD_SHARED_LIBRARY)
@@ -97,6 +94,22 @@ ifeq ($(TARGET_INCLUDE_FENCE_SYMBOLS),true)
   include $(CLEAR_VARS)
   LOCAL_SRC_FILES := fence.cpp
   LOCAL_MODULE := libmtkshim_fence
+  LOCAL_PROPRIETARY_MODULE := true
+  include $(BUILD_SHARED_LIBRARY)
+endif
+
+ifeq ($(TARGET_INCLUDE_RIL_SYMBOLS),true)
+  include $(CLEAR_VARS)
+  LOCAL_SRC_FILES := ril.cpp
+  LOCAL_MODULE := libmtkshim_ril
+  LOCAL_PROPRIETARY_MODULE := true
+  include $(BUILD_SHARED_LIBRARY)
+endif
+
+ifeq ($(TARGET_INCLUDE_FINGERPRINT_SYMBOLS),true)
+  include $(CLEAR_VARS)
+  LOCAL_SRC_FILES := fingerprint.cpp
+  LOCAL_MODULE := libmtkshim_fingerprint
   LOCAL_PROPRIETARY_MODULE := true
   include $(BUILD_SHARED_LIBRARY)
 endif

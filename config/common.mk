@@ -5,9 +5,11 @@ PRODUCT_PACKAGES += \
     libmtkshim_ui \
     libmtkshim_omx \
     libmtkshim_gps \
+	libmtkshim_ril \
 	libmtkshim_vtmal \
 	libmtkshim_pbbuilder \
 	libmtkshim_mediajni \
+	libmtkshim_fingerprint \
 
 # Display
 PRODUCT_PACKAGES += \
@@ -68,6 +70,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.config.vc_call_vol_steps=14 \
     ro.config.media_vol_steps=30
+
+#BOARD_SEPOLICY_DIRS := \
+#  vendor/mediatek/sepolicy
 
 ANDROID_VERSION = 7.1.2
 

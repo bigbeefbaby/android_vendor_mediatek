@@ -5,20 +5,17 @@ PRODUCT_PACKAGES += \
     libmtkshim_ui \
     libmtkshim_omx \
     libmtkshim_gps \
-	libmtkshim_ril \
-	libmtkshim_vtmal \
-	libmtkshim_pbbuilder \
-	libmtkshim_mediajni \
-	libmtkshim_fingerprint \
+    libmtkshim_ril \
+    libmtkshim_vtmal \
+    libmtkshim_pbbuilder \
+    libmtkshim_mediajni \
+    libmtkshim_fingerprint \
 
 # Display
 PRODUCT_PACKAGES += \
     libion
 
 # GPS
-PRODUCT_COPY_FILES += \
-    vendor/mediatek/prebuilt/etc/agps_profiles_conf2.xml:system/etc/agps_profiles_conf2.xml
-
 PRODUCT_PACKAGES += \
     libcurl
 
@@ -77,7 +74,4 @@ PRODUCT_PROPERTY_OVERRIDES += \
 ANDROID_VERSION = 7.1.2
 
 # include other configs
-include vendor/mediatek/config/permissions.mk
-include vendor/mediatek/config/media.mk
 include vendor/mediatek/config/symbols.mk
-include vendor/mediatek/config/telephony.mk

@@ -1,6 +1,0 @@
-LOCAL_PATH := $(call my-dir)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE = mplugin
-LOCAL_SRC_FILES := $(call all-subdir-java-files)
-include $(LOCAL_PREBUILT_JAVA_LIBRARIES)

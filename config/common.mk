@@ -1,16 +1,6 @@
 # Common overlays
 DEVICE_PACKAGE_OVERLAYS += vendor/mediatek/overlay
 
-# Shim libraries
-PRODUCT_PACKAGES += \
-    libmtkshim_log \
-    libmtkshim_audio \
-    libmtkshim_ui \
-    libmtkshim_gui \
-    libmtkshim_omx \
-    libmtkshim_camera \
-    libmtkshim_gps
-
 # Display
 PRODUCT_PACKAGES += \
     libion
@@ -72,95 +62,9 @@ PRODUCT_PACKAGES += \
     android.hardware.gnss@1.0-service \
     libcurl
 
-PRODUCT_COPY_FILES += \
-    vendor/mediatek/prebuilt/etc/agps_profiles_conf2.xml:system/etc/agps_profiles_conf2.xml
-
-# Jelly
-PRODUCT_PACKAGES += \
-    Jelly
-
-# OmniStyle
-PRODUCT_PACKAGES += \
-    OmniStyle
-
-# OmniJaws
-PRODUCT_PACKAGES += \
-    OmniJaws
-
-# madCamera
-PRODUCT_PACKAGES += \
-    madCamera
-
-# Include explicitly to work around Facelock issues
-PRODUCT_PACKAGES += \
-    libprotobuf-cpp-full
-
-# FMRadio
-PRODUCT_PACKAGES += \
-    libfmjni \
-    FMRadio
-
-# Filesystem management tools
-PRODUCT_PACKAGES += \
-    e2fsck \
-    fsck.f2fs \
-    mkfs.f2fs \
-    make_ext4fs
-
-# exFAT
-PRODUCT_PACKAGES += \
-    fsck.exfat \
-    mkfs.exfat
-
-# NTFS
-PRODUCT_PACKAGES += \
-    fsck.ntfs \
-    mkfs.ntfs \
-    mount.ntfs
-
-# USB
-PRODUCT_PACKAGES += \
-    com.android.future.usb.accessory
-
-# Charger
-PRODUCT_PACKAGES += \
-    charger_res_images \
-
-# WallpaperPicker
-PRODUCT_PACKAGES += \
-    WallpaperPicker
-
-# Sensor Calibration
-PRODUCT_PACKAGES += \
-    libem_sensor_jni
-
-# Audio Settings
-PRODUCT_PACKAGES += \
-    libaudio_volume_jni
-
-# ThemeInterfacer
-PRODUCT_PACKAGES += \
-    ThemeInterfacer
-
-# WiFi Display
-# this property enables the user to access Google WFD settings.
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.debug.wfd.enable=1
-
-# SELinux
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.build.selinux=1
-
-LINEAGE_VERSION := 15.1
-
 ANDROID_VERSION := 8.1.0
 
 # include other configs
+include vendor/mediatek/config/board.mk
 include vendor/mediatek/config/permissions.mk
 include vendor/mediatek/config/media.mk
-include vendor/mediatek/config/wifi.mk
-include vendor/mediatek/config/telephony.mk
-include vendor/mediatek/config/google_override.mk
-
-# DEBUG_BOOT
-include vendor/mediatek/config/debug_boot.mk
